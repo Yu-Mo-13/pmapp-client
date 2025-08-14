@@ -49,7 +49,7 @@ export default function Home() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                <tr className="hover:bg-gray-50 h-16">
+                <tr className="h-16">
                   <td className="px-6 py-4 text-base text-gray-900 border-r text-left truncate" style={{borderColor: '#d1d5db'}}>Amazon</td>
                   <td className="px-6 py-4 text-base text-gray-900 border-r text-center" style={{borderColor: '#d1d5db'}}>あり</td>
                   <td className="px-6 py-4 text-base text-gray-900 border-r text-center" style={{borderColor: '#d1d5db'}}></td>
@@ -60,21 +60,21 @@ export default function Home() {
                     </button>
                   </td>
                 </tr>
-                <tr className="hover:bg-gray-50 h-16">
+                <tr className="h-16">
                   <td className="px-6 py-4 text-base text-gray-900 border-r text-left truncate" style={{borderColor: '#d1d5db'}}>XXX</td>
                   <td className="px-6 py-4 text-base text-gray-900 border-r text-center" style={{borderColor: '#d1d5db'}}>なし</td>
                   <td className="px-6 py-4 text-base text-gray-900 border-r text-center" style={{borderColor: '#d1d5db'}}></td>
                   <td className="px-6 py-4 text-base text-gray-900 border-r text-center" style={{borderColor: '#d1d5db'}}></td>
                   <td className="px-6 py-4 text-center"></td>
                 </tr>
-                <tr className="hover:bg-gray-50 h-16">
+                <tr className="h-16">
                   <td className="px-6 py-4 text-base text-gray-900 border-r text-left truncate" style={{borderColor: '#d1d5db'}}>XXX</td>
                   <td className="px-6 py-4 text-base text-gray-900 border-r text-center" style={{borderColor: '#d1d5db'}}>...</td>
                   <td className="px-6 py-4 text-base text-gray-900 border-r text-center" style={{borderColor: '#d1d5db'}}></td>
                   <td className="px-6 py-4 text-base text-gray-900 border-r text-center" style={{borderColor: '#d1d5db'}}></td>
                   <td className="px-6 py-4 text-center"></td>
                 </tr>
-                <tr className="hover:bg-gray-50 h-16">
+                <tr className="h-16">
                   <td className="px-6 py-4 text-base text-gray-900 border-r text-left truncate" style={{borderColor: '#d1d5db'}}>...</td>
                   <td className="px-6 py-4 text-base text-gray-900 border-r text-center" style={{borderColor: '#d1d5db'}}></td>
                   <td className="px-6 py-4 text-base text-gray-900 border-r text-center" style={{borderColor: '#d1d5db'}}></td>
@@ -83,7 +83,7 @@ export default function Home() {
                 </tr>
                 {/* 空の行を追加してテーブルの高さを確保 */}
                 {Array.from({ length: 6 }, (_, index) => (
-                  <tr key={index} className="hover:bg-gray-50 h-16">
+                  <tr key={index} className="h-16">
                     <td className="px-6 py-4 text-base text-gray-900 border-r text-left truncate" style={{borderColor: '#d1d5db'}}></td>
                     <td className="px-6 py-4 text-base text-gray-900 border-r text-center" style={{borderColor: '#d1d5db'}}></td>
                     <td className="px-6 py-4 text-base text-gray-900 border-r text-center" style={{borderColor: '#d1d5db'}}></td>
