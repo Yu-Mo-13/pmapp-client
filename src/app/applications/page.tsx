@@ -7,7 +7,6 @@ import { ApplicationService } from '@/api/services/application/applicationServic
 
 const Page: React.FC = async () => {
   const res = await ApplicationService.index();
-  console.log(res);
   const applications: Application[] = Array.isArray(res.data) ? res.data : [];
 
   return (
