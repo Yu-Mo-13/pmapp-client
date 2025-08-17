@@ -1,20 +1,14 @@
-/**
- * TODO: アプリケーション一覧画面本実装ではここで型指定する
- */
+import { Application } from "@/api/services/application/applicationService";
 
-// export interface ApplicationTableProps {
-//   applications?: Application[];
-// }
+export interface ApplicationTableRowProps {
+  application: Partial<Application>;
+}
 
-// export interface Application {
-//   id?: string;
-//   name: string;
-//   symbol: string;
-//   notification: string;
-//   account: string;
-// }
+export interface ApplicationTableProps {
+  applications?: Application[];
+}
 
-// export interface ApplicationListProps {
-//   title?: string;
-//   applications?: Application[];
-// }
+export interface ApplicationListProps {
+  title?: string;
+  applications?: Application[];
+}

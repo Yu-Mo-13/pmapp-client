@@ -1,41 +1,21 @@
 // components/PmappUI.tsx
 
 import React from 'react';
-import { Application } from '@/components/table/types';
+import { Application } from '@/api/services/application/applicationService';
 import ApplicationList from '@/app/applications/_components/ApplicationList';
+import { ApplicationService } from '@/api/services/application/applicationService';
 
-const PmappUI: React.FC = () => {
-  // Next.jsでは通常、getServerSidePropsやgetStaticPropsでデータ取得
-  const sampleApplications: Application[] = [
-    {
-      id: "aws",
-      name: "Amazon Web Services",
-      symbol: "あり",
-      notification: "毎月",
-      account: "個人",
-    },
-    {
-      id: "gws",
-      name: "Google Workspace",
-      symbol: "あり",
-      notification: "",
-      account: "法人",
-    },
-    {
-      id: "m365",
-      name: "Microsoft 365",
-      symbol: "なし",
-      notification: "",
-      account: "",
-    },
-  ];
+const Page: React.FC = async () => {
+  const res = await ApplicationService.index();
+  console.log(res);
+  const applications: Application[] = Array.isArray(res.data) ? res.data : [];
 
   return (
     <ApplicationList
       title={'アプリケーション一覧'}
-      applications={sampleApplications}
+      applications={applications}
     />
   );
 };
 
-export default PmappUI;
+export default Page;

@@ -9,8 +9,12 @@ export interface Application {
   mark_class: boolean,
 }
 
+export type ApplicationIndexResponse = {
+  data: Application[];
+}
+
 export class ApplicationService {
-  static async index(): Promise<ApiResponse<Application[]>> {
+  static async index(): Promise<ApiResponse<ApplicationIndexResponse>> {
     return apiClient.get('/applications');
   }
 }

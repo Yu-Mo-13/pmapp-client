@@ -1,20 +1,11 @@
 // components/ApplicationTable.tsx
 
 import React from 'react';
-import { ApplicationTableProps, Application } from '@/components/table/types';
-import { Th, Tr, TableRowWrapper } from '@/components/table';
+import { ApplicationTableProps } from '../types';
+import { Th, TableRowWrapper } from '@/components/table';
+import ApplicationTr from '@/app/applications/_components/ApplicationTr';
 
-const ApplicationTable: React.FC<ApplicationTableProps> = ({ applications = [] }) => {
-  const defaultApplications: Application[] = [
-    { id: "1", name: "Amazon", symbol: "あり", notification: "", account: "" },
-    { id: "2", name: "XXX", symbol: "なし", notification: "", account: "" },
-    { id: "3", name: "XXX", symbol: "...", notification: "", account: "" },
-    { id: "4", name: "...", symbol: "", notification: "", account: "" },
-  ];
-
-  const data = applications.length > 0 ? applications : defaultApplications;
-  const emptyRows = Math.max(0, 10 - data.length);
-
+const ApplicationTable: React.FC<ApplicationTableProps> = ({ applications }) => {
   const headerStyle = { backgroundColor: '#3E3E3E', borderColor: '#3E3E3E' };
 
   return (
@@ -56,11 +47,8 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({ applications = [] }
           </TableRowWrapper>
         </thead>
         <tbody className="divide-y divide-gray-200">
-          {data.map((app, index) => (
-            <Tr key={app.id || `app-${index}`} application={app} />
-          ))}
-          {Array.from({ length: emptyRows }, (_, index) => (
-            <Tr key={`empty-${index}`} application={{}} />
+          {applications && applications.map((app) => (
+            <ApplicationTr key={app.id} application={app} />
           ))}
         </tbody>
       </table>
