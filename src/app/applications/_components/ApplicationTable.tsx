@@ -42,7 +42,7 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({ applications }) => 
             </Th>
 
             <Th style={headerStyle}>
-              操作
+              {''}
             </Th>
           </TableRowWrapper>
         </thead>
