@@ -1,20 +1,11 @@
-// components/TableRow.tsx
-
 'use client';
 
 import React from 'react';
-import { TableRowProps } from '@/components/table/types';
+import { ApplicationTableRowProps } from '../types';
 import { Td, TableRowWrapper } from '@/components/table';
-import Button from '../Button';
+import Button from '../../../components/Button';
 
-const TableRow: React.FC<TableRowProps> = ({ application }) => {
-  const {
-    name = "",
-    symbol = "",
-    notification = "",
-    account = "",
-  } = application;
-
+const ApplicationTr: React.FC<ApplicationTableRowProps> = ({ application }) => {
   const handleDetailClick = () => {
       // Next.jsでは router.push() を使用することを想定
       console.log(`詳細ページへ遷移: ${name}`);
@@ -28,30 +19,30 @@ const TableRow: React.FC<TableRowProps> = ({ application }) => {
       <Td
         className="border-r text-left truncate"
         style={borderStyle}
-        title={name || undefined}
+        title={application.name}
       >
-        {name && <span>{name}</span>}
+        {application.name && <span>{application.name}</span>}
       </Td>
 
       <Td
         className="border-r text-center"
         style={borderStyle}
       >
-        {symbol}
+        {application.mark_class ? 'あり' : 'なし'}
       </Td>
 
       <Td
         className="border-r text-center"
         style={borderStyle}
       >
-        {notification}
+        {application.notice_class ? 'あり' : 'なし'}
       </Td>
 
       <Td
         className="border-r text-center"
         style={borderStyle}
       >
-        {account}
+        {application.account_class ? 'あり' : 'なし'}
       </Td>
 
       <Td className="text-center">
@@ -64,4 +55,4 @@ const TableRow: React.FC<TableRowProps> = ({ application }) => {
   );
 };
 
-export default TableRow;
+export default ApplicationTr;

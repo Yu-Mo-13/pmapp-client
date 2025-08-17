@@ -1,7 +1,5 @@
-// components/MainContent.tsx
-
 import React from 'react';
-import { ApplicationListProps } from '@/components/table/types';
+import { ApplicationListProps } from '@/app/applications/types';
 import ApplicationTable from '@/app/applications/_components/ApplicationTable';
 
 const ApplicationList: React.FC<ApplicationListProps> = (props: ApplicationListProps) => {
