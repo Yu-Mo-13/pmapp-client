@@ -1,5 +1,3 @@
-// components/PmappUI.tsx
-
 import React from 'react';
 import { Application } from '@/api/services/application/applicationService';
 import ApplicationList from '@/app/applications/_components/ApplicationList';
