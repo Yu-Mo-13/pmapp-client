@@ -47,7 +47,7 @@ const ApplicationTr: React.FC<ApplicationTableRowProps> = ({ application }) => {
 
       <Td className="text-center">
           <Button
-          text='詳細'
+            text='詳細'
             onClick={handleDetailClick}
           />
       </Td>
