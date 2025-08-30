@@ -9,18 +9,20 @@ const ApplicationEditPage: React.FC = () => {
         {/* ヘッダー部分 */}
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-xl font-bold text-gray-800 mb-6">アプリケーション編集</h2>
-          <button className="text-red-600 hover:text-red-400 font-medium underline">
-            削除する
-          </button>
         </div>
 
         {/* フォーム部分 */}
         <div className="px-6 space-y-6 text-[20px]">
           {/* アプリケーション名 */}
           <div>
-            <label className="block text-gray-700 font-medium mb-3">
-              アプリケーション名
-            </label>
+            <div className="flex justify-between items-center mb-3">
+              <label className="block text-gray-700 font-medium">
+                アプリケーション名
+              </label>
+              <button className="text-red-600 hover:text-red-400 font-medium underline">
+                削除する
+              </button>
+            </div>
             <input
               type="text"
               className="w-full m-4 text-black px-4 py-3 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
