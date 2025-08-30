@@ -20,7 +20,7 @@ const ApplicationCreatePage: React.FC = () => {
             </label>
             <input
               type="text"
-              className="w-full m-4 text-black px-4 py-3 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+              className="w-[97%] m-4 text-black px-4 py-3 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
             />
           </div>
 
@@ -79,7 +79,7 @@ const ApplicationCreatePage: React.FC = () => {
         </div>
 
         {/* ボタン部分 */}
-        <div className="flex justify-center mt-20 gap-32">
+        <div className="flex justify-center mt-14 gap-32">
           <button className="px-8 py-3 text-[18px] border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
             キャンセル
           </button>
