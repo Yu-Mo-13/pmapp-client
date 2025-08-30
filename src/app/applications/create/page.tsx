@@ -2,6 +2,8 @@ import React from 'react';
 import Image from 'next/image';
 import ToggleOff from '@/assets/images/toggle/toggleOff.svg';
 // import ToggleOn from '@/assets/images/toggle/toggleOn.svg';
+import ArrowUp from '@/assets/images/arrow/arrowUp.svg';
+import ArrowDown from '@/assets/images/arrow/arrowDown.svg';
 
 const ApplicationCreatePage: React.FC = () => {
   return (
@@ -65,16 +67,13 @@ const ApplicationCreatePage: React.FC = () => {
             <label className="text-gray-700 font-medium mb-3">
               仮登録パスワード桁数
             </label>
-            <select
-              defaultValue={8}
-              className="px-4 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent bg-white"
-            >
-              <option value={4}>4</option>
-              <option value={6}>6</option>
-              <option value={8}>8</option>
-              <option value={10}>10</option>
-              <option value={12}>12</option>
-            </select>
+            <input
+              type="number"
+              defaultValue={10}
+              min={1}
+              step={1}
+              className="px-4 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent bg-white w-20"
+            />
           </div>
         </div>
 
