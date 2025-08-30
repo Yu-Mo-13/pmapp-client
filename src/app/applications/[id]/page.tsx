@@ -1,4 +1,7 @@
 import React from 'react';
+import Image from 'next/image';
+import ToggleOff from '@/assets/images/toggle/toggleOff.svg';
+// import ToggleOn from '@/assets/images/toggle/toggleOn.svg';
 
 const ApplicationEditPage: React.FC = () => {
   return (
@@ -30,11 +33,8 @@ const ApplicationEditPage: React.FC = () => {
               アカウント区分
             </label>
             <div className="flex items-center">
-              <button
-                type="button"
-                className="relative inline-flex h-6 w-11 mb-3 items-center rounded-full transition-colors bg-gray-300"
-              >
-                <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1" />
+              <button type="button" className="mb-3">
+                <Image src={ToggleOff} alt="Toggle Off" width={44} height={24} />
               </button>
             </div>
           </div>
@@ -45,11 +45,8 @@ const ApplicationEditPage: React.FC = () => {
               定期通知区分
             </label>
             <div className="flex items-center">
-              <button
-                type="button"
-                className="relative inline-flex h-6 w-11 mb-3 items-center rounded-full transition-colors bg-green-500"
-              >
-                <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6" />
+              <button type="button" className="mb-3">
+                <Image src={ToggleOff} alt="Toggle Off" width={44} height={24} />
               </button>
             </div>
           </div>
@@ -60,17 +57,14 @@ const ApplicationEditPage: React.FC = () => {
               記号区分
             </label>
             <div className="flex items-center">
-              <button
-                type="button"
-                className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors bg-gray-300 mb-3"
-              >
-                <span className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1" />
+              <button type="button" className="mb-3">
+                <Image src={ToggleOff} alt="Toggle Off" width={44} height={24} />
               </button>
             </div>
           </div>
 
           {/* 仮登録パスワード桁数 */}
-          <div className="flex items-center gap-[72px]">
+          <div className="flex items-center gap-[74px]">
             <label className="text-gray-700 font-medium mb-3">
               仮登録パスワード桁数
             </label>
