@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
-import { ApiError, ApiResponse, RequestConfig, ValidationErrorResponse, ErrorResponseData, RequestData } from './types';
+import { ApiError, ApiResponse, RequestConfig, ErrorResponseData, RequestData } from './types';
 
 class ApiClient {
   private instance: AxiosInstance;
@@ -51,7 +51,7 @@ class ApiClient {
     return null;
   }
 
-  private handleError(error: AxiosError): ApiError {
+  private handleError(error: AxiosError): ApiError & { validationErrors?: unknown } {
     const status = error.response?.status || 500;
     const responseData = error.response?.data as ErrorResponseData;
 
@@ -80,12 +80,12 @@ class ApiClient {
         };
 
       case 422:
-        // バリデーションエラー
-        const validationError = responseData as ValidationErrorResponse;
+        // バリデーションエラー - レスポンスデータも含める
         return {
-          message: validationError?.message || '入力データに問題があります。',
+          message: responseData?.message || '入力データに問題があります。',
           status,
           code: 'VALIDATION_ERROR',
+          validationErrors: responseData, // バリデーションエラーの詳細を保持
         };
 
       case 500:
@@ -146,8 +146,19 @@ class ApiClient {
         success: true,
       };
     } catch (error) {
+      const apiError = error as ApiError & { validationErrors?: unknown };
+      
+      // 422エラーの場合はvalidationErrorsも含める
+      if (apiError.status === 422 && apiError.validationErrors) {
+        return {
+          error: apiError,
+          validationErrors: apiError.validationErrors,
+          success: false,
+        };
+      }
+      
       return {
-        error: error as ApiError,
+        error: apiError,
         success: false,
       };
     }

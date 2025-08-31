@@ -1,5 +1,6 @@
 import apiClient from '../../client';
 import { ApiResponse } from '../../types';
+import { extractValidationErrors } from '../../utils/validationErrorTransformer';
 
 export interface Application {
   id: number,
@@ -47,6 +48,16 @@ export class ApplicationService {
   }
 
   static async create(request: ApplicationCreateRequest): Promise<ApplicationCreateApiResponse> {
-    return apiClient.post('/applications', request);
+    const response = await apiClient.post('/applications', request);
+    
+    // バリデーションエラーがある場合は変換して返す
+    if (!response.success && response.validationErrors) {
+      const errors = extractValidationErrors(response);
+      if (errors) {
+        return { errors: errors as ApplicationCreateValidationError };
+      }
+    }
+    
+    return response;
   }
 }

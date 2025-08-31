@@ -7,6 +7,7 @@ export interface ApiError {
 export interface ApiResponse<T = unknown> {
   data?: T;
   error?: ApiError;
+  validationErrors?: unknown; // バリデーションエラーの詳細
   success: boolean;
 }
 
