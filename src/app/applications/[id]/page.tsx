@@ -4,13 +4,21 @@ import ToggleOff from '@/assets/images/toggle/toggleOff.svg';
 // import ToggleOn from '@/assets/images/toggle/toggleOn.svg';
 import ArrowUp from '@/assets/images/arrow/arrowUp.svg';
 import ArrowDown from '@/assets/images/arrow/arrowDown.svg';
+import { redirect } from 'next/navigation';
+import CancelButton from '@/components/button/CancelButton';
+import SubmitButton from '@/components/button/SubmitButton';
+import Title from '@/components/Title';
 
 const ApplicationEditPage: React.FC = () => {
+  const handleRegistClick = async () => {
+    "use server";
+    redirect('/applications');
+  };
   return (
     <main className="flex-1 p-6">
         {/* ヘッダー部分 */}
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-xl font-bold text-gray-800 mb-6">アプリケーション編集</h2>
+          <Title title="アプリケーション編集" />
         </div>
 
         {/* フォーム部分 */}
@@ -100,14 +108,8 @@ const ApplicationEditPage: React.FC = () => {
 
         {/* ボタン部分 */}
         <div className="flex justify-center mt-14 gap-32">
-          <button className="px-8 py-3 text-[18px] border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors">
-            キャンセル
-          </button>
-          <button
-            className="text-white w-36 px-6 py-3 rounded bg-[#3CB371] text-[18px] font-medium hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-opacity duration-200"
-          >
-            更新
-          </button>
+          <CancelButton to="/applications" />
+          <SubmitButton onSubmit={handleRegistClick} text="更新" />
         </div>
     </main>
   );
