@@ -14,8 +14,8 @@ export async function createApplication(prevState: FormState, formData: FormData
   const accountClass = formData.get('account_class') === TOGGLE_ON;
   const noticeClass = formData.get('notice_class') === TOGGLE_ON;
   const markClass = formData.get('mark_class') === TOGGLE_ON;
-  const prePasswordSize = parseInt(formData.get('pre_password_size') as string) || 10;
-  
+  const prePasswordSize = parseInt(formData.get('pre_password_size') as string);
+
   try {
     const response = await ApplicationService.create({
       application: {
@@ -26,7 +26,7 @@ export async function createApplication(prevState: FormState, formData: FormData
         pre_password_size: prePasswordSize,
       }
     });
-    
+
     if ('errors' in response && response.errors) {
       return {
         errors: response.errors,
@@ -34,13 +34,12 @@ export async function createApplication(prevState: FormState, formData: FormData
         shouldRedirect: false
       };
     }
-    
+
     // 成功時はリダイレクトフラグを返す
     return {
       success: true,
       shouldRedirect: true
     };
-    
   } catch (error) {
     console.error('Application creation failed:', error);
     return {
