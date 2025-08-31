@@ -29,14 +29,20 @@ export async function createApplication(prevState: FormState, formData: FormData
     });
     
     console.log('API Response:', response);
+    console.log('Response type check - has errors:', 'errors' in response);
+    if ('errors' in response) {
+      console.log('Response errors:', response.errors);
+    }
     
     if ('errors' in response && response.errors) {
       console.log('Validation errors found:', response.errors);
-      return {
+      const errorState = {
         errors: response.errors,
         success: false,
         shouldRedirect: false
       };
+      console.log('Returning error state:', errorState);
+      return errorState;
     }
     
     console.log('Success - redirecting');
