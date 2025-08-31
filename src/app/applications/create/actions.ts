@@ -9,10 +9,11 @@ export interface FormState {
 }
 
 export async function createApplication(prevState: FormState, formData: FormData): Promise<FormState> {
+  const TOGGLE_ON = '1';
   const name = formData.get('name') as string;
-  const accountClass = formData.get('account_class') === 'on';
-  const noticeClass = formData.get('notice_class') === 'on';
-  const markClass = formData.get('mark_class') === 'on';
+  const accountClass = formData.get('account_class') === TOGGLE_ON;
+  const noticeClass = formData.get('notice_class') === TOGGLE_ON;
+  const markClass = formData.get('mark_class') === TOGGLE_ON;
   const prePasswordSize = parseInt(formData.get('pre_password_size') as string) || 10;
   
   try {
