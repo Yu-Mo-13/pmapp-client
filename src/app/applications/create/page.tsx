@@ -1,18 +1,62 @@
 import React from 'react';
-import Image from 'next/image';
-import ToggleOff from '@/assets/images/toggle/toggleOff.svg';
-// import ToggleOn from '@/assets/images/toggle/toggleOn.svg';
-import ArrowUp from '@/assets/images/arrow/arrowUp.svg';
-import ArrowDown from '@/assets/images/arrow/arrowDown.svg';
 import { redirect } from 'next/navigation';
 import CancelButton from '@/components/button/CancelButton';
-import SubmitButton from '@/components/button/SubmitButton';
 import Title from '@/components/Title';
+import ToggleButton from '@/components/ToggleButton';
+import NumberInput from '@/components/NumberInput';
+import SubmitButton from '@/components/button/SubmitButton';
+import { ApplicationService, ApplicationCreateValidationError } from '@/api/services/application/applicationService';
 
-const ApplicationCreatePage: React.FC = () => {
-  const handleRegistClick = async () => {
+interface ApplicationCreatePageProps {
+  searchParams?: {
+    errors?: string;
+  };
+}
+
+const ApplicationCreatePage: React.FC<ApplicationCreatePageProps> = ({ searchParams }) => {
+  let errors: ApplicationCreateValidationError | null = null;
+  
+  if (searchParams?.errors) {
+    try {
+      errors = JSON.parse(decodeURIComponent(searchParams.errors));
+    } catch (e) {
+      console.error('Error parsing validation errors:', e);
+    }
+  }
+
+  const handleRegistClick = async (formData: FormData) => {
     "use server";
-    redirect('/applications');
+    
+    const name = formData.get('name') as string;
+    const accountClass = formData.get('account_class') === 'on';
+    const noticeClass = formData.get('notice_class') === 'on';
+    const markClass = formData.get('mark_class') === 'on';
+    const prePasswordSize = parseInt(formData.get('pre_password_size') as string) || 10;
+    
+    try {
+      const response = await ApplicationService.create({
+        application: {
+          name,
+          account_class: accountClass,
+          notice_class: noticeClass,
+          mark_class: markClass,
+          pre_password_size: prePasswordSize,
+        }
+      });
+      
+      if ('errors' in response && response.errors) {
+        const errorParam = encodeURIComponent(JSON.stringify(response.errors));
+        redirect(`/applications/create?errors=${errorParam}`);
+      } else {
+        redirect('/applications');
+      }
+    } catch (error) {
+      console.error('Application creation failed:', error);
+      const errorParam = encodeURIComponent(JSON.stringify({
+        application: { name: ['登録に失敗しました。再度お試しください。'] }
+      }));
+      redirect(`/applications/create?errors=${errorParam}`);
+    }
   };
   return (
     <main className="flex-1 p-6">
@@ -22,7 +66,7 @@ const ApplicationCreatePage: React.FC = () => {
         </div>
 
         {/* フォーム部分 */}
-        <div className="px-6 space-y-6 text-[20px]">
+        <form action={handleRegistClick} className="px-6 space-y-6 text-[20px]">
           {/* アプリケーション名 */}
           <div>
             <label className="block text-gray-700 font-medium mb-3">
@@ -30,8 +74,14 @@ const ApplicationCreatePage: React.FC = () => {
             </label>
             <input
               type="text"
+              name="name"
               className="w-[97%] m-4 text-black px-4 py-3 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
             />
+            {errors?.application?.name && (
+              <div className="text-red-500 text-sm mt-1 ml-4">
+                {errors.application.name.join(', ')}
+              </div>
+            )}
           </div>
 
           {/* アカウント区分 */}
@@ -40,10 +90,13 @@ const ApplicationCreatePage: React.FC = () => {
               アカウント区分
             </label>
             <div className="flex items-center">
-              <button type="button" className="mb-3">
-                <Image src={ToggleOff} alt="Toggle Off" width={44} height={24} />
-              </button>
+              <ToggleButton name="account_class" />
             </div>
+            {errors?.application?.account_class && (
+              <div className="text-red-500 text-sm mt-1">
+                {errors.application.account_class.join(', ')}
+              </div>
+            )}
           </div>
 
           {/* 定期通知区分 */}
@@ -52,10 +105,13 @@ const ApplicationCreatePage: React.FC = () => {
               定期通知区分
             </label>
             <div className="flex items-center">
-              <button type="button" className="mb-3">
-                <Image src={ToggleOff} alt="Toggle Off" width={44} height={24} />
-              </button>
+              <ToggleButton name="notice_class" />
             </div>
+            {errors?.application?.notice_class && (
+              <div className="text-red-500 text-sm mt-1">
+                {errors.application.notice_class.join(', ')}
+              </div>
+            )}
           </div>
 
           {/* 記号区分 */}
@@ -64,10 +120,13 @@ const ApplicationCreatePage: React.FC = () => {
               記号区分
             </label>
             <div className="flex items-center">
-              <button type="button" className="mb-3">
-                <Image src={ToggleOff} alt="Toggle Off" width={44} height={24} />
-              </button>
+              <ToggleButton name="mark_class" />
             </div>
+            {errors?.application?.mark_class && (
+              <div className="text-red-500 text-sm mt-1">
+                {errors.application.mark_class.join(', ')}
+              </div>
+            )}
           </div>
 
           {/* 仮登録パスワード桁数 */}
@@ -75,37 +134,26 @@ const ApplicationCreatePage: React.FC = () => {
             <label className="text-gray-700 font-medium mb-3">
               仮登録パスワード桁数
             </label>
-            <div className="relative flex items-center">
-              <input
-                type="number"
-                defaultValue={10}
-                min={1}
-                step={1}
-                className="px-4 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent bg-white w-24 pr-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              />
-              <div className="absolute right-1 flex flex-col">
-                <button
-                  type="button"
-                  className="p-1 hover:bg-gray-100 rounded"
-                >
-                  <Image src={ArrowUp} alt="増加" width={16} height={16} />
-                </button>
-                <button
-                  type="button"
-                  className="p-1 hover:bg-gray-100 rounded"
-                >
-                  <Image src={ArrowDown} alt="減少" width={16} height={16} />
-                </button>
+            <NumberInput name="pre_password_size" defaultValue={10} min={1} step={1} />
+            {errors?.application?.pre_password_size && (
+              <div className="text-red-500 text-sm mt-1">
+                {errors.application.pre_password_size.join(', ')}
               </div>
-            </div>
+            )}
           </div>
-        </div>
 
-        {/* ボタン部分 */}
-        <div className="flex justify-center mt-14 gap-32">
-          <CancelButton to="/applications" />
-          <SubmitButton onSubmit={handleRegistClick} text="登録" />
-        </div>
+          {/* ボタン部分 */}
+          <div className="flex justify-center mt-14 gap-32">
+            <CancelButton to="/applications" />
+            <SubmitButton onSubmit={() => {
+              const form = document.querySelector('form');
+              if (form) {
+                const formData = new FormData(form as HTMLFormElement);
+                handleRegistClick(formData);
+              }
+            }} text="登録" />
+          </div>
+        </form>
     </main>
   );
 };
