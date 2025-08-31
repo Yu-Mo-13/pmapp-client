@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import { useActionState } from 'react';
 import { useRouter } from 'next/navigation';
+import SubmitButton from '@/components/button/SubmitButton';
 import CancelButton from '@/components/button/CancelButton';
 import ToggleButton from '@/components/ToggleButton';
 import NumberInput from '@/components/NumberInput';
@@ -100,12 +101,10 @@ const ApplicationForm: React.FC = () => {
       {/* ボタン部分 */}
       <div className="flex justify-center mt-14 gap-32">
         <CancelButton to="/applications" />
-        <button
-          type="submit"
-          className="text-white w-36 px-6 py-3 rounded bg-[#3CB371] text-[18px] font-medium hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-opacity duration-200"
-        >
-          登録
-        </button>
+        <SubmitButton
+          isSubmit
+          text="登録"
+        />
       </div>
     </form>
   );

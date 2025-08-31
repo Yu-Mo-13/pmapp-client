@@ -109,7 +109,7 @@ const ApplicationEditPage: React.FC = () => {
         {/* ボタン部分 */}
         <div className="flex justify-center mt-14 gap-32">
           <CancelButton to="/applications" />
-          <SubmitButton onSubmit={handleRegistClick} text="更新" />
+          <SubmitButton onClick={handleRegistClick} text="更新" />
         </div>
     </main>
   );
