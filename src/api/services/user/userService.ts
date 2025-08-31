@@ -52,15 +52,23 @@ export class UserService {
   /**
    * ユーザーを作成
    */
-  static async createUser(userData: CreateUserRequest): Promise<ApiResponse<User>> {
+  static async createUser(
+    userData: CreateUserRequest
+  ): Promise<ApiResponse<User>> {
     return apiClient.post<User>('/users', userData as unknown as RequestData);
   }
 
   /**
    * ユーザーを更新
    */
-  static async updateUser(id: number, userData: UpdateUserRequest): Promise<ApiResponse<User>> {
-    return apiClient.put<User>(`/users/${id}`, userData as unknown as RequestData);
+  static async updateUser(
+    id: number,
+    userData: UpdateUserRequest
+  ): Promise<ApiResponse<User>> {
+    return apiClient.put<User>(
+      `/users/${id}`,
+      userData as unknown as RequestData
+    );
   }
 
   /**
@@ -73,14 +81,19 @@ export class UserService {
   /**
    * ログイン
    */
-  static async login(credentials: LoginRequest): Promise<ApiResponse<LoginResponse>> {
-    const response = await apiClient.post<LoginResponse>('/auth/login', credentials as unknown as RequestData);
-    
+  static async login(
+    credentials: LoginRequest
+  ): Promise<ApiResponse<LoginResponse>> {
+    const response = await apiClient.post<LoginResponse>(
+      '/auth/login',
+      credentials as unknown as RequestData
+    );
+
     // ログイン成功時にトークンを保存
     if (response.success && response.data?.token) {
       apiClient.setAuthToken(response.data.token);
     }
-    
+
     return response;
   }
 
@@ -89,12 +102,12 @@ export class UserService {
    */
   static async logout(): Promise<ApiResponse<void>> {
     const response = await apiClient.post<void>('/auth/logout');
-    
+
     // ログアウト時にトークンをクリア
     if (response.success) {
       localStorage.removeItem('auth_token');
     }
-    
+
     return response;
   }
 }

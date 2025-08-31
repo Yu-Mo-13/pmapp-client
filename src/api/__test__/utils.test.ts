@@ -4,7 +4,7 @@ import { ApiResponse } from '../types';
 describe('ApiResponseHandler', () => {
   const successResponse: ApiResponse<{ id: number; name: string }> = {
     success: true,
-    data: { id: 1, name: 'Test User' }
+    data: { id: 1, name: 'Test User' },
   };
 
   const errorResponse: ApiResponse<unknown> = {
@@ -12,8 +12,8 @@ describe('ApiResponseHandler', () => {
     error: {
       message: 'Test error',
       status: 404,
-      code: 'NOT_FOUND'
-    }
+      code: 'NOT_FOUND',
+    },
   };
 
   describe('isSuccess', () => {
@@ -27,7 +27,7 @@ describe('ApiResponseHandler', () => {
 
     it('dataが未定義の場合falseを返す', () => {
       const responseWithoutData: ApiResponse<unknown> = {
-        success: true
+        success: true,
       };
       expect(ApiResponseHandler.isSuccess(responseWithoutData)).toBe(false);
     });
@@ -44,7 +44,7 @@ describe('ApiResponseHandler', () => {
 
     it('errorが未定義の場合falseを返す', () => {
       const responseWithoutError: ApiResponse<unknown> = {
-        success: false
+        success: false,
       };
       expect(ApiResponseHandler.isError(responseWithoutError)).toBe(false);
     });
@@ -72,7 +72,9 @@ describe('ApiResponseHandler', () => {
     });
 
     it('成功レスポンスの場合falseを返す', () => {
-      expect(ApiResponseHandler.isStatusError(successResponse, 404)).toBe(false);
+      expect(ApiResponseHandler.isStatusError(successResponse, 404)).toBe(
+        false
+      );
     });
   });
 
@@ -82,38 +84,48 @@ describe('ApiResponseHandler', () => {
       error: {
         message: 'Error message',
         status,
-        code: 'TEST_ERROR'
-      }
+        code: 'TEST_ERROR',
+      },
     });
 
     it('isValidationError - 422エラーを正しく判定する', () => {
       const validationError = createErrorResponse(422);
       expect(ApiResponseHandler.isValidationError(validationError)).toBe(true);
-      expect(ApiResponseHandler.isValidationError(createErrorResponse(400))).toBe(false);
+      expect(
+        ApiResponseHandler.isValidationError(createErrorResponse(400))
+      ).toBe(false);
     });
 
     it('isAuthError - 401エラーを正しく判定する', () => {
       const authError = createErrorResponse(401);
       expect(ApiResponseHandler.isAuthError(authError)).toBe(true);
-      expect(ApiResponseHandler.isAuthError(createErrorResponse(403))).toBe(false);
+      expect(ApiResponseHandler.isAuthError(createErrorResponse(403))).toBe(
+        false
+      );
     });
 
     it('isForbiddenError - 403エラーを正しく判定する', () => {
       const forbiddenError = createErrorResponse(403);
       expect(ApiResponseHandler.isForbiddenError(forbiddenError)).toBe(true);
-      expect(ApiResponseHandler.isForbiddenError(createErrorResponse(401))).toBe(false);
+      expect(
+        ApiResponseHandler.isForbiddenError(createErrorResponse(401))
+      ).toBe(false);
     });
 
     it('isNotFoundError - 404エラーを正しく判定する', () => {
       const notFoundError = createErrorResponse(404);
       expect(ApiResponseHandler.isNotFoundError(notFoundError)).toBe(true);
-      expect(ApiResponseHandler.isNotFoundError(createErrorResponse(400))).toBe(false);
+      expect(ApiResponseHandler.isNotFoundError(createErrorResponse(400))).toBe(
+        false
+      );
     });
 
     it('isServerError - 500エラーを正しく判定する', () => {
       const serverError = createErrorResponse(500);
       expect(ApiResponseHandler.isServerError(serverError)).toBe(true);
-      expect(ApiResponseHandler.isServerError(createErrorResponse(404))).toBe(false);
+      expect(ApiResponseHandler.isServerError(createErrorResponse(404))).toBe(
+        false
+      );
     });
   });
 });
@@ -136,8 +148,8 @@ describe('ErrorNotificationHandler', () => {
         error: {
           message: '認証エラー',
           status: 401,
-          code: 'UNAUTHORIZED'
-        }
+          code: 'UNAUTHORIZED',
+        },
       };
 
       ErrorNotificationHandler.handleError(authError);
@@ -150,8 +162,8 @@ describe('ErrorNotificationHandler', () => {
         error: {
           message: '権限エラー',
           status: 403,
-          code: 'FORBIDDEN'
-        }
+          code: 'FORBIDDEN',
+        },
       };
 
       ErrorNotificationHandler.handleError(forbiddenError);
@@ -164,12 +176,15 @@ describe('ErrorNotificationHandler', () => {
         error: {
           message: 'リソースが見つかりません',
           status: 404,
-          code: 'NOT_FOUND'
-        }
+          code: 'NOT_FOUND',
+        },
       };
 
       ErrorNotificationHandler.handleError(notFoundError);
-      expect(consoleSpy).toHaveBeenCalledWith('リソースが見つかりません:', 'リソースが見つかりません');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'リソースが見つかりません:',
+        'リソースが見つかりません'
+      );
     });
 
     it('422バリデーションエラーを適切に処理する', () => {
@@ -178,12 +193,15 @@ describe('ErrorNotificationHandler', () => {
         error: {
           message: 'バリデーションエラー',
           status: 422,
-          code: 'VALIDATION_ERROR'
-        }
+          code: 'VALIDATION_ERROR',
+        },
       };
 
       ErrorNotificationHandler.handleError(validationError);
-      expect(consoleSpy).toHaveBeenCalledWith('入力エラー:', 'バリデーションエラー');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '入力エラー:',
+        'バリデーションエラー'
+      );
     });
 
     it('500サーバーエラーを適切に処理する', () => {
@@ -192,12 +210,15 @@ describe('ErrorNotificationHandler', () => {
         error: {
           message: 'サーバーエラー',
           status: 500,
-          code: 'INTERNAL_SERVER_ERROR'
-        }
+          code: 'INTERNAL_SERVER_ERROR',
+        },
       };
 
       ErrorNotificationHandler.handleError(serverError);
-      expect(consoleSpy).toHaveBeenCalledWith('サーバーエラー:', 'サーバーエラー');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'サーバーエラー:',
+        'サーバーエラー'
+      );
     });
 
     it('その他のエラーを適切に処理する', () => {
@@ -206,8 +227,8 @@ describe('ErrorNotificationHandler', () => {
         error: {
           message: '不明なエラー',
           status: 400,
-          code: 'UNKNOWN'
-        }
+          code: 'UNKNOWN',
+        },
       };
 
       ErrorNotificationHandler.handleError(unknownError);
@@ -217,7 +238,7 @@ describe('ErrorNotificationHandler', () => {
     it('成功レスポンスの場合は何も出力しない', () => {
       const successResponse: ApiResponse<{ id: number }> = {
         success: true,
-        data: { id: 1 }
+        data: { id: 1 },
       };
 
       ErrorNotificationHandler.handleError(successResponse);
