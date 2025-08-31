@@ -10,6 +10,11 @@ interface ToggleButtonProps {
   defaultValue?: boolean;
 }
 
+enum ToggleButtonState {
+  TRUE = 1,
+  FALSE = 0
+}
+
 const ToggleButton: React.FC<ToggleButtonProps> = ({ name, defaultValue = false }) => {
   const [isOn, setIsOn] = useState(defaultValue);
 
@@ -19,7 +24,7 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({ name, defaultValue = false 
 
   return (
     <>
-      <input type="hidden" name={name} value={isOn ? 'on' : 'off'} />
+      <input type="hidden" name={name} value={isOn ? ToggleButtonState.TRUE : ToggleButtonState.FALSE} />
       <button type="button" onClick={handleToggle} className="mb-3">
         <Image 
           src={isOn ? ToggleOn : ToggleOff} 
