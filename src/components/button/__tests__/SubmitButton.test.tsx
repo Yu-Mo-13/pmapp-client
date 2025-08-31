@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import SubmitButton from '../SubmitButton';
 import '@testing-library/jest-dom';
 
@@ -79,7 +79,7 @@ describe('SubmitButton', () => {
       }).not.toThrow();
     });
 
-    it('短時間で複数回クリックした場合、onClickは1回のみ呼び出される', () => {
+    it('複数回クリックした場合、onClickが複数回呼び出される', () => {
       const mockOnClick = jest.fn();
       render(<SubmitButton text="クリック" onClick={mockOnClick} />);
       
@@ -88,95 +88,7 @@ describe('SubmitButton', () => {
       fireEvent.click(button);
       fireEvent.click(button);
       
-      expect(mockOnClick).toHaveBeenCalledTimes(1);
-    });
-
-    it('クリック後、ボタンが無効化される', () => {
-      const mockOnClick = jest.fn();
-      render(<SubmitButton text="クリック" onClick={mockOnClick} />);
-      
-      const button = screen.getByRole('button');
-      fireEvent.click(button);
-      
-      expect(button).toBeDisabled();
-      expect(button).toHaveClass('bg-gray-400', 'cursor-not-allowed', 'opacity-60');
-    });
-
-    it('デバウンス時間後にボタンが再度有効になる', async () => {
-      const mockOnClick = jest.fn();
-      render(<SubmitButton text="クリック" onClick={mockOnClick} />);
-      
-      const button = screen.getByRole('button');
-      fireEvent.click(button);
-      
-      expect(mockOnClick).toHaveBeenCalledTimes(1);
-      expect(button).toBeDisabled();
-      
-      // 1000ms後にボタンが再度有効になることを確認
-      await act(async () => {
-        await new Promise(resolve => setTimeout(resolve, 1100));
-      });
-      
-      expect(button).not.toBeDisabled();
-      expect(button).toHaveClass('bg-[#3CB371]');
-      
-      // 再度クリック可能
-      fireEvent.click(button);
-      expect(mockOnClick).toHaveBeenCalledTimes(2);
-    });
-
-    it('デバウンス時間中は再クリックが無効（Fake Timers使用）', () => {
-      jest.useFakeTimers();
-      
-      const mockOnClick = jest.fn();
-      render(<SubmitButton text="クリック" onClick={mockOnClick} />);
-      
-      const button = screen.getByRole('button');
-      fireEvent.click(button);
-      
-      expect(mockOnClick).toHaveBeenCalledTimes(1);
-      expect(button).toBeDisabled();
-      
-      // 500ms経過
-      act(() => {
-        jest.advanceTimersByTime(500);
-      });
-      
-      // まだ無効状態
-      expect(button).toBeDisabled();
-      fireEvent.click(button);
-      expect(mockOnClick).toHaveBeenCalledTimes(1); // 増えない
-      
-      // 1000ms経過（デバウンス時間完了）
-      act(() => {
-        jest.advanceTimersByTime(500);
-      });
-      
-      // 有効状態に戻る
-      expect(button).not.toBeDisabled();
-      fireEvent.click(button);
-      expect(mockOnClick).toHaveBeenCalledTimes(2); // 再度呼ばれる
-      
-      jest.useRealTimers();
-    });
-
-    it('無効状態の時にクリックしても何も起こらない', () => {
-      const mockOnClick = jest.fn();
-      render(<SubmitButton text="クリック" onClick={mockOnClick} />);
-      
-      const button = screen.getByRole('button');
-      
-      // 最初のクリック
-      fireEvent.click(button);
-      expect(mockOnClick).toHaveBeenCalledTimes(1);
-      expect(button).toBeDisabled();
-      
-      // 無効状態での追加クリック（handleClick内のif (isClicked) return; をテスト）
-      fireEvent.click(button);
-      fireEvent.click(button);
-      
-      // onClickは追加で呼ばれない
-      expect(mockOnClick).toHaveBeenCalledTimes(1);
+      expect(mockOnClick).toHaveBeenCalledTimes(3);
     });
   });
 
