@@ -7,7 +7,7 @@ import SubmitButton from '@/components/button/SubmitButton';
 import CancelButton from '@/components/button/CancelButton';
 import ToggleButton from '@/components/ToggleButton';
 import NumberInput from '@/components/NumberInput';
-import { createApplication, FormState } from './actions';
+import { createApplication, FormState } from './ApplicationCreateActions';
 
 const ApplicationForm: React.FC = () => {
   const router = useRouter();
