@@ -6,6 +6,7 @@ import ArrowUp from '@/assets/images/arrow/arrowUp.svg';
 import ArrowDown from '@/assets/images/arrow/arrowDown.svg';
 import { redirect } from 'next/navigation';
 import CancelButton from '@/components/button/CancelButton';
+import SubmitButton from '@/components/button/SubmitButton';
 
 const ApplicationCreatePage: React.FC = () => {
   const handleRegistClick = async () => {
@@ -102,13 +103,7 @@ const ApplicationCreatePage: React.FC = () => {
         {/* ボタン部分 */}
         <div className="flex justify-center mt-14 gap-32">
           <CancelButton to="/applications" />
-          <form action={handleRegistClick}>
-            <button
-              className="text-white w-36 px-6 py-3 rounded bg-[#3CB371] text-[18px] font-medium hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-opacity duration-200"
-            >
-              登録
-            </button>
-          </form>
+          <SubmitButton onSubmit={handleRegistClick} text="登録" />
         </div>
     </main>
   );
