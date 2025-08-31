@@ -7,6 +7,7 @@ import ArrowDown from '@/assets/images/arrow/arrowDown.svg';
 import { redirect } from 'next/navigation';
 import CancelButton from '@/components/button/CancelButton';
 import SubmitButton from '@/components/button/SubmitButton';
+import Title from '@/components/Title';
 
 const ApplicationCreatePage: React.FC = () => {
   const handleRegistClick = async () => {
@@ -17,7 +18,7 @@ const ApplicationCreatePage: React.FC = () => {
     <main className="flex-1 p-6">
         {/* ヘッダー部分 */}
         <div className="flex justify-between items-center mb-8">
-          <h2 className="text-xl font-bold text-gray-800 mb-6">アプリケーション新規登録</h2>
+          <Title title="アプリケーション新規登録" />
         </div>
 
         {/* フォーム部分 */}
