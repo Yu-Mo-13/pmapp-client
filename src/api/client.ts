@@ -51,7 +51,7 @@ class ApiClient {
     return null;
   }
 
-  private handleError(error: AxiosError): ApiError {
+  private handleError(error: AxiosError): ApiError & { validationErrors?: unknown } {
     const status = error.response?.status || 500;
     const responseData = error.response?.data as ErrorResponseData;
 
@@ -80,7 +80,7 @@ class ApiClient {
         };
 
       case 422:
-        // バリデーションエラー - 詳細情報を保持
+        // バリデーションエラー - レスポンスデータも含める
         return {
           message: responseData?.message || '入力データに問題があります。',
           status,
@@ -146,8 +146,19 @@ class ApiClient {
         success: true,
       };
     } catch (error) {
+      const apiError = error as ApiError & { validationErrors?: unknown };
+      
+      // 422エラーの場合はvalidationErrorsも含める
+      if (apiError.status === 422 && apiError.validationErrors) {
+        return {
+          error: apiError,
+          validationErrors: apiError.validationErrors,
+          success: false,
+        };
+      }
+      
       return {
-        error: error as ApiError,
+        error: apiError,
         success: false,
       };
     }

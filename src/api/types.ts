@@ -2,12 +2,12 @@ export interface ApiError {
   message: string;
   status: number;
   code?: string;
-  validationErrors?: unknown; // バリデーションエラーの詳細情報
 }
 
 export interface ApiResponse<T = unknown> {
   data?: T;
   error?: ApiError;
+  validationErrors?: unknown; // バリデーションエラーの詳細
   success: boolean;
 }
 

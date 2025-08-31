@@ -20,11 +20,6 @@ const ApplicationForm: React.FC = () => {
     }
   }, [state.shouldRedirect, router]);
 
-  // デバッグ用: stateの変更を監視
-  useEffect(() => {
-    console.log('ApplicationForm state changed:', state);
-  }, [state]);
-
   return (
     <form action={formAction} className="px-6 space-y-6 text-[20px]">
       {/* アプリケーション名 */}

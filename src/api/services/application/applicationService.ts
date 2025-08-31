@@ -1,5 +1,6 @@
 import apiClient from '../../client';
 import { ApiResponse } from '../../types';
+import { extractValidationErrors } from '../../utils/validationErrorTransformer';
 
 export interface Application {
   id: number,
@@ -47,43 +48,14 @@ export class ApplicationService {
   }
 
   static async create(request: ApplicationCreateRequest): Promise<ApplicationCreateApiResponse> {
-    console.log('ApplicationService.create called with:', request);
-    
     const response = await apiClient.post('/applications', request);
     
-    console.log('Raw API response:', response);
-    
-    // エラーレスポンスかつ422エラーの場合、バリデーションエラーとして処理
-    if (!response.success && response.error?.status === 422 && response.error.validationErrors) {
-      console.log('Processing validation errors:', response.error.validationErrors);
-      
-      // バックエンドのエラー形式を期待する形式に変換
-      const backendErrors = response.error.validationErrors as {
-        message: string;
-        errors: Record<string, string[]>;
-      };
-      const transformedErrors: ApplicationCreateValidationError = {
-        application: {}
-      };
-      
-      // 'application.name' -> { application: { name: [...] } } に変換
-      if (backendErrors.errors) {
-        Object.keys(backendErrors.errors).forEach(key => {
-          if (key.startsWith('application.')) {
-            const fieldName = key.replace('application.', '') as keyof NonNullable<ApplicationCreateValidationError['application']>;
-            if (!transformedErrors.application) {
-              transformedErrors.application = {};
-            }
-            (transformedErrors.application as Record<string, string[]>)[fieldName] = backendErrors.errors[key];
-          }
-        });
+    // バリデーションエラーがある場合は変換して返す
+    if (!response.success && response.validationErrors) {
+      const errors = extractValidationErrors(response);
+      if (errors) {
+        return { errors: errors as ApplicationCreateValidationError };
       }
-      
-      console.log('Transformed errors:', transformedErrors);
-      
-      return {
-        errors: transformedErrors
-      };
     }
     
     return response;

@@ -15,8 +15,6 @@ export async function createApplication(prevState: FormState, formData: FormData
   const markClass = formData.get('mark_class') === 'on';
   const prePasswordSize = parseInt(formData.get('pre_password_size') as string) || 10;
   
-  console.log('Form data:', { name, accountClass, noticeClass, markClass, prePasswordSize });
-  
   try {
     const response = await ApplicationService.create({
       application: {
@@ -28,24 +26,14 @@ export async function createApplication(prevState: FormState, formData: FormData
       }
     });
     
-    console.log('API Response:', response);
-    console.log('Response type check - has errors:', 'errors' in response);
-    if ('errors' in response) {
-      console.log('Response errors:', response.errors);
-    }
-    
     if ('errors' in response && response.errors) {
-      console.log('Validation errors found:', response.errors);
-      const errorState = {
+      return {
         errors: response.errors,
         success: false,
         shouldRedirect: false
       };
-      console.log('Returning error state:', errorState);
-      return errorState;
     }
     
-    console.log('Success - redirecting');
     // 成功時はリダイレクトフラグを返す
     return {
       success: true,
