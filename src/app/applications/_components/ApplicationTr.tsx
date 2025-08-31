@@ -1,15 +1,13 @@
-'use client';
-
 import React from 'react';
 import { ApplicationTableRowProps } from '../types';
 import { Td, TableRowWrapper } from '@/components/table';
 import Button from '../../../components/Button';
+import { redirect } from 'next/navigation';
 
 const ApplicationTr: React.FC<ApplicationTableRowProps> = ({ application }) => {
-  const handleDetailClick = () => {
-      // Next.jsでは router.push() を使用することを想定
-      console.log(`詳細ページへ遷移: ${name}`);
-      // router.push(`/applications/${application.id}/detail`);
+  const handleDetailClick = async () => {
+    "use server";
+    redirect(`/applications/${application.id}`);
   };
 
   const borderStyle = { borderColor: '#d1d5db' };
@@ -46,10 +44,12 @@ const ApplicationTr: React.FC<ApplicationTableRowProps> = ({ application }) => {
       </Td>
 
       <Td className="text-center">
+        <form action={handleDetailClick}>
           <Button
             text='詳細'
             onClick={handleDetailClick}
           />
+        </form>
       </Td>
     </TableRowWrapper>
   );
