@@ -27,7 +27,7 @@ describe('ApiClient', () => {
     mockAxios.reset();
     // localStorageのモックをリセット
     jest.clearAllMocks();
-    
+
     // テスト用のAPIクライアントを作成
     apiClient = new ApiClient('http://localhost:3000/api');
   });
@@ -64,9 +64,9 @@ describe('ApiClient', () => {
     it('認証トークンがある場合はヘッダーに含める', async () => {
       const mockData = { id: 1, name: 'Test User' };
       const token = 'test-token';
-      
+
       localStorageMock.getItem.mockReturnValue(token);
-      
+
       mockAxios.onGet('http://localhost:3000/api/users').reply((config) => {
         expect(config.headers?.Authorization).toBe(`Bearer ${token}`);
         return [200, mockData];
@@ -80,8 +80,10 @@ describe('ApiClient', () => {
     it('成功したPOSTリクエストを処理する', async () => {
       const requestData = { name: 'New User', email: 'user@example.com' };
       const responseData = { id: 1, ...requestData };
-      
-      mockAxios.onPost('http://localhost:3000/api/users').reply(200, responseData);
+
+      mockAxios
+        .onPost('http://localhost:3000/api/users')
+        .reply(200, responseData);
 
       const response = await apiClient.post('/users', requestData);
 
@@ -94,9 +96,15 @@ describe('ApiClient', () => {
   describe('PUT requests', () => {
     it('成功したPUTリクエストを処理する', async () => {
       const requestData = { name: 'Updated User' };
-      const responseData = { id: 1, name: 'Updated User', email: 'user@example.com' };
-      
-      mockAxios.onPut('http://localhost:3000/api/users/1').reply(200, responseData);
+      const responseData = {
+        id: 1,
+        name: 'Updated User',
+        email: 'user@example.com',
+      };
+
+      mockAxios
+        .onPut('http://localhost:3000/api/users/1')
+        .reply(200, responseData);
 
       const response = await apiClient.put('/users/1', requestData);
 
@@ -120,7 +128,7 @@ describe('ApiClient', () => {
   describe('Error handling', () => {
     it('401エラーを適切に処理する', async () => {
       mockAxios.onGet('http://localhost:3000/api/users').reply(401, {
-        message: 'Unauthorized'
+        message: 'Unauthorized',
       });
 
       const response = await apiClient.get('/users');
@@ -129,15 +137,17 @@ describe('ApiClient', () => {
       expect(response.error).toBeDefined();
       expect(response.error?.status).toBe(401);
       expect(response.error?.code).toBe('UNAUTHORIZED');
-      expect(response.error?.message).toBe('認証が必要です。再度ログインしてください。');
-      
+      expect(response.error?.message).toBe(
+        '認証が必要です。再度ログインしてください。'
+      );
+
       // トークンがクリアされることを確認
       expect(localStorageMock.removeItem).toHaveBeenCalledWith('auth_token');
     });
 
     it('403エラーを適切に処理する', async () => {
       mockAxios.onGet('http://localhost:3000/api/users').reply(403, {
-        message: 'Forbidden'
+        message: 'Forbidden',
       });
 
       const response = await apiClient.get('/users');
@@ -145,7 +155,9 @@ describe('ApiClient', () => {
       expect(response.success).toBe(false);
       expect(response.error?.status).toBe(403);
       expect(response.error?.code).toBe('FORBIDDEN');
-      expect(response.error?.message).toBe('この操作を実行する権限がありません。');
+      expect(response.error?.message).toBe(
+        'この操作を実行する権限がありません。'
+      );
     });
 
     it('404エラーを適切に処理する', async () => {
@@ -156,18 +168,20 @@ describe('ApiClient', () => {
       expect(response.success).toBe(false);
       expect(response.error?.status).toBe(404);
       expect(response.error?.code).toBe('NOT_FOUND');
-      expect(response.error?.message).toBe('リクエストされたリソースが見つかりません。');
+      expect(response.error?.message).toBe(
+        'リクエストされたリソースが見つかりません。'
+      );
     });
 
     it('422バリデーションエラーを適切に処理する', async () => {
       const validationError = {
         message: 'Validation failed',
-        errors: [
-          { field: 'email', message: 'Email is required' }
-        ]
+        errors: [{ field: 'email', message: 'Email is required' }],
       };
-      
-      mockAxios.onPost('http://localhost:3000/api/users').reply(422, validationError);
+
+      mockAxios
+        .onPost('http://localhost:3000/api/users')
+        .reply(422, validationError);
 
       const response = await apiClient.post('/users', {});
 
@@ -185,7 +199,9 @@ describe('ApiClient', () => {
       expect(response.success).toBe(false);
       expect(response.error?.status).toBe(500);
       expect(response.error?.code).toBe('INTERNAL_SERVER_ERROR');
-      expect(response.error?.message).toBe('サーバーエラーが発生しました。しばらく時間をおいてから再度お試しください。');
+      expect(response.error?.message).toBe(
+        'サーバーエラーが発生しました。しばらく時間をおいてから再度お試しください。'
+      );
     });
 
     it('ネットワークエラーを適切に処理する', async () => {
@@ -202,20 +218,23 @@ describe('ApiClient', () => {
   describe('Authentication token management', () => {
     it('認証トークンを設定できる', () => {
       const token = 'new-auth-token';
-      
+
       apiClient.setAuthToken(token);
-      
-      expect(localStorageMock.setItem).toHaveBeenCalledWith('auth_token', token);
+
+      expect(localStorageMock.setItem).toHaveBeenCalledWith(
+        'auth_token',
+        token
+      );
     });
 
     it('ベースURLを変更できる', () => {
       const newBaseURL = 'https://new-api.example.com';
-      
+
       apiClient.setBaseURL(newBaseURL);
-      
+
       // 変更が正常に行われたかを確認するため、リクエストを送信
       mockAxios.onGet('https://new-api.example.com/test').reply(200, {});
-      
+
       expect(async () => {
         await apiClient.get('/test');
       }).not.toThrow();
@@ -225,27 +244,27 @@ describe('ApiClient', () => {
   describe('Request configuration', () => {
     it('カスタムヘッダーを含むリクエストを送信できる', async () => {
       const customHeaders = { 'X-Custom-Header': 'custom-value' };
-      
+
       mockAxios.onGet('http://localhost:3000/api/users').reply((config) => {
         expect(config.headers?.['X-Custom-Header']).toBe('custom-value');
         return [200, {}];
       });
 
       await apiClient.get('/users', {
-        headers: customHeaders
+        headers: customHeaders,
       });
     });
 
     it('カスタムタイムアウトを設定できる', async () => {
       const customTimeout = 5000;
-      
+
       mockAxios.onGet('http://localhost:3000/api/users').reply((config) => {
         expect(config.timeout).toBe(customTimeout);
         return [200, {}];
       });
 
       await apiClient.get('/users', {
-        timeout: customTimeout
+        timeout: customTimeout,
       });
     });
   });

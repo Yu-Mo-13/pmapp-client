@@ -34,4 +34,11 @@ export interface ErrorResponseData {
   [key: string]: unknown;
 }
 
-export type RequestData = Record<string, unknown> | unknown[] | FormData | string | number | boolean | null;
+export type RequestData =
+  | Record<string, unknown>
+  | unknown[]
+  | FormData
+  | string
+  | number
+  | boolean
+  | null;

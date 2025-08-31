@@ -11,7 +11,11 @@ import { createApplication, FormState } from './ApplicationCreateActions';
 
 const ApplicationForm: React.FC = () => {
   const router = useRouter();
-  const initialState: FormState = { errors: undefined, success: false, shouldRedirect: false };
+  const initialState: FormState = {
+    errors: undefined,
+    success: false,
+    shouldRedirect: false,
+  };
   const [state, formAction] = useActionState(createApplication, initialState);
 
   // 成功時のリダイレクト処理
@@ -42,9 +46,7 @@ const ApplicationForm: React.FC = () => {
 
       {/* アカウント区分 */}
       <div className="flex items-center gap-[132px]">
-        <label className="text-gray-700 font-medium mb-3">
-          アカウント区分
-        </label>
+        <label className="text-gray-700 font-medium mb-3">アカウント区分</label>
         <div className="flex items-center">
           <ToggleButton name="account_class" />
         </div>
@@ -57,9 +59,7 @@ const ApplicationForm: React.FC = () => {
 
       {/* 定期通知区分 */}
       <div className="flex items-center gap-[152px]">
-        <label className="text-gray-700 font-medium mb-3">
-          定期通知区分
-        </label>
+        <label className="text-gray-700 font-medium mb-3">定期通知区分</label>
         <div className="flex items-center">
           <ToggleButton name="notice_class" />
         </div>
@@ -72,9 +72,7 @@ const ApplicationForm: React.FC = () => {
 
       {/* 記号区分 */}
       <div className="flex items-center gap-48">
-        <label className="text-gray-700 font-medium mb-3">
-          記号区分
-        </label>
+        <label className="text-gray-700 font-medium mb-3">記号区分</label>
         <div className="flex items-center">
           <ToggleButton name="mark_class" />
         </div>
@@ -90,7 +88,12 @@ const ApplicationForm: React.FC = () => {
         <label className="text-gray-700 font-medium mb-3">
           仮登録パスワード桁数
         </label>
-        <NumberInput name="pre_password_size" defaultValue={10} min={1} step={1} />
+        <NumberInput
+          name="pre_password_size"
+          defaultValue={10}
+          min={1}
+          step={1}
+        />
         {state.errors?.application?.pre_password_size && (
           <div className="text-red-500 text-sm mt-1">
             {state.errors.application.pre_password_size.join(', ')}
@@ -101,10 +104,7 @@ const ApplicationForm: React.FC = () => {
       {/* ボタン部分 */}
       <div className="flex justify-center mt-14 gap-32">
         <CancelButton to="/applications" />
-        <SubmitButton
-          isSubmit
-          text="登録"
-        />
+        <SubmitButton isSubmit text="登録" />
       </div>
     </form>
   );

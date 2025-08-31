@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 
 const ApplicationTr: React.FC<ApplicationTableRowProps> = ({ application }) => {
   const handleDetailClick = async () => {
-    "use server";
+    'use server';
     redirect(`/applications/${application.id}`);
   };
 
@@ -22,33 +22,21 @@ const ApplicationTr: React.FC<ApplicationTableRowProps> = ({ application }) => {
         {application.name && <span>{application.name}</span>}
       </Td>
 
-      <Td
-        className="border-r text-center"
-        style={borderStyle}
-      >
+      <Td className="border-r text-center" style={borderStyle}>
         {application.mark_class ? 'あり' : 'なし'}
       </Td>
 
-      <Td
-        className="border-r text-center"
-        style={borderStyle}
-      >
+      <Td className="border-r text-center" style={borderStyle}>
         {application.notice_class ? 'あり' : 'なし'}
       </Td>
 
-      <Td
-        className="border-r text-center"
-        style={borderStyle}
-      >
+      <Td className="border-r text-center" style={borderStyle}>
         {application.account_class ? 'あり' : 'なし'}
       </Td>
 
       <Td className="text-center">
         <form action={handleDetailClick}>
-          <Button
-            text='詳細'
-            onClick={handleDetailClick}
-          />
+          <Button text="詳細" onClick={handleDetailClick} />
         </form>
       </Td>
     </TableRowWrapper>

@@ -43,8 +43,13 @@ export class ProductService {
   /**
    * プロダクト一覧を取得
    */
-  static async getProducts(page = 1, limit = 10): Promise<ApiResponse<ProductsListResponse>> {
-    return apiClient.get<ProductsListResponse>(`/products?page=${page}&limit=${limit}`);
+  static async getProducts(
+    page = 1,
+    limit = 10
+  ): Promise<ApiResponse<ProductsListResponse>> {
+    return apiClient.get<ProductsListResponse>(
+      `/products?page=${page}&limit=${limit}`
+    );
   }
 
   /**
@@ -57,15 +62,26 @@ export class ProductService {
   /**
    * プロダクトを作成
    */
-  static async createProduct(productData: CreateProductRequest): Promise<ApiResponse<Product>> {
-    return apiClient.post<Product>('/products', productData as unknown as RequestData);
+  static async createProduct(
+    productData: CreateProductRequest
+  ): Promise<ApiResponse<Product>> {
+    return apiClient.post<Product>(
+      '/products',
+      productData as unknown as RequestData
+    );
   }
 
   /**
    * プロダクトを更新
    */
-  static async updateProduct(id: number, productData: UpdateProductRequest): Promise<ApiResponse<Product>> {
-    return apiClient.put<Product>(`/products/${id}`, productData as unknown as RequestData);
+  static async updateProduct(
+    id: number,
+    productData: UpdateProductRequest
+  ): Promise<ApiResponse<Product>> {
+    return apiClient.put<Product>(
+      `/products/${id}`,
+      productData as unknown as RequestData
+    );
   }
 
   /**
@@ -78,7 +94,9 @@ export class ProductService {
   /**
    * カテゴリ別プロダクト一覧を取得
    */
-  static async getProductsByCategory(categoryId: number): Promise<ApiResponse<Product[]>> {
+  static async getProductsByCategory(
+    categoryId: number
+  ): Promise<ApiResponse<Product[]>> {
     return apiClient.get<Product[]>(`/products/category/${categoryId}`);
   }
 }

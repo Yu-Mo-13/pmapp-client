@@ -16,22 +16,26 @@ src/api/__test__/
 ## テストの実行方法
 
 ### 全てのテストを実行
+
 ```bash
 npm test
 ```
 
 ### 特定のテストファイルを実行
+
 ```bash
 npm test client.test.ts
 npm test userService.test.ts
 ```
 
 ### ウォッチモードでテストを実行
+
 ```bash
 npm run test:watch
 ```
 
 ### カバレッジレポートを生成
+
 ```bash
 npm run test:coverage
 ```
@@ -39,6 +43,7 @@ npm run test:coverage
 ## テスト内容
 
 ### 1. APIクライアント (`client.test.ts`)
+
 - ✅ コンストラクタのテスト
 - ✅ GET/POST/PUT/DELETEリクエストのテスト
 - ✅ エラーハンドリング（401、403、404、422、500）
@@ -46,11 +51,13 @@ npm run test:coverage
 - ✅ リクエスト設定（ヘッダー、タイムアウト）
 
 ### 2. ユーティリティ (`utils.test.ts`)
+
 - ✅ ApiResponseHandler の各メソッド
 - ✅ エラータイプ判定（認証、権限、バリデーション等）
 - ✅ ErrorNotificationHandler のエラー処理
 
 ### 3. UserService (`userService.test.ts`)
+
 - ✅ ユーザー一覧取得
 - ✅ 特定ユーザー取得
 - ✅ ユーザー作成・更新・削除
@@ -58,6 +65,7 @@ npm run test:coverage
 - ✅ エラーケース（404、422、401、403、500）
 
 ### 4. ProductService (`productService.test.ts`)
+
 - ✅ プロダクト一覧取得（ページング含む）
 - ✅ 特定プロダクト取得
 - ✅ プロダクト作成・更新・削除
@@ -67,6 +75,7 @@ npm run test:coverage
 ## モック設定
 
 ### LocalStorage
+
 ```javascript
 const localStorageMock = {
   getItem: jest.fn(),
@@ -78,6 +87,7 @@ global.localStorage = localStorageMock;
 ```
 
 ### Axios
+
 ```javascript
 import MockAdapter from 'axios-mock-adapter';
 const mockAxios = new MockAdapter(axios);
@@ -86,16 +96,19 @@ const mockAxios = new MockAdapter(axios);
 ## テストパターン
 
 ### 成功ケース
+
 - 正常なレスポンスの処理
 - データの正確性
 - 副作用（トークン保存等）の確認
 
 ### エラーケース
+
 - 各HTTPステータスコードの処理
 - エラーメッセージの適切な設定
 - エラー時の副作用処理
 
 ### エッジケース
+
 - 空のデータ
 - 無効なパラメータ
 - ネットワークエラー

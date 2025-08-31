@@ -7,14 +7,18 @@ export class ApiResponseHandler {
   /**
    * APIレスポンスが成功かどうかを判定
    */
-  static isSuccess<T>(response: ApiResponse<T>): response is ApiResponse<T> & { success: true; data: T } {
+  static isSuccess<T>(
+    response: ApiResponse<T>
+  ): response is ApiResponse<T> & { success: true; data: T } {
     return response.success && response.data !== undefined;
   }
 
   /**
    * APIレスポンスが失敗かどうかを判定
    */
-  static isError<T>(response: ApiResponse<T>): response is ApiResponse<T> & { success: false; error: ApiError } {
+  static isError<T>(
+    response: ApiResponse<T>
+  ): response is ApiResponse<T> & { success: false; error: ApiError } {
     return !response.success && response.error !== undefined;
   }
 
@@ -85,7 +89,7 @@ export class ErrorNotificationHandler {
     }
 
     const error = response.error;
-    
+
     switch (error.status) {
       case 401:
         console.error('認証エラー:', error.message);

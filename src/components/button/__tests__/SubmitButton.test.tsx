@@ -6,14 +6,14 @@ describe('SubmitButton', () => {
   describe('レンダリング', () => {
     it('指定されたテキストが表示される', () => {
       render(<SubmitButton text="保存" />);
-      
+
       const button = screen.getByRole('button', { name: '保存' });
       expect(button).toBeInTheDocument();
     });
 
     it('適切なスタイリングが適用される', () => {
       render(<SubmitButton text="送信" />);
-      
+
       const button = screen.getByRole('button');
       expect(button).toHaveClass(
         'text-white',
@@ -38,21 +38,21 @@ describe('SubmitButton', () => {
   describe('typeプロパティ', () => {
     it('isSubmitがtrueの場合、type="submit"になる', () => {
       render(<SubmitButton text="送信" isSubmit={true} />);
-      
+
       const button = screen.getByRole('button');
       expect(button).toHaveAttribute('type', 'submit');
     });
 
     it('isSubmitがfalseの場合、type="button"になる', () => {
       render(<SubmitButton text="送信" isSubmit={false} />);
-      
+
       const button = screen.getByRole('button');
       expect(button).toHaveAttribute('type', 'button');
     });
 
     it('isSubmitが未指定の場合、type="button"になる', () => {
       render(<SubmitButton text="送信" />);
-      
+
       const button = screen.getByRole('button');
       expect(button).toHaveAttribute('type', 'button');
     });
@@ -62,18 +62,18 @@ describe('SubmitButton', () => {
     it('onClickが提供されている場合、クリック時に呼び出される', () => {
       const mockOnClick = jest.fn();
       render(<SubmitButton text="クリック" onClick={mockOnClick} />);
-      
+
       const button = screen.getByRole('button');
       fireEvent.click(button);
-      
+
       expect(mockOnClick).toHaveBeenCalledTimes(1);
     });
 
     it('onClickが提供されていない場合、クリックしてもエラーにならない', () => {
       render(<SubmitButton text="クリック" />);
-      
+
       const button = screen.getByRole('button');
-      
+
       expect(() => {
         fireEvent.click(button);
       }).not.toThrow();
@@ -82,12 +82,12 @@ describe('SubmitButton', () => {
     it('複数回クリックした場合、onClickが複数回呼び出される', () => {
       const mockOnClick = jest.fn();
       render(<SubmitButton text="クリック" onClick={mockOnClick} />);
-      
+
       const button = screen.getByRole('button');
       fireEvent.click(button);
       fireEvent.click(button);
       fireEvent.click(button);
-      
+
       expect(mockOnClick).toHaveBeenCalledTimes(3);
     });
   });
@@ -96,17 +96,13 @@ describe('SubmitButton', () => {
     it('すべてのプロパティが正しく適用される', () => {
       const mockOnClick = jest.fn();
       render(
-        <SubmitButton 
-          text="完了" 
-          isSubmit={true} 
-          onClick={mockOnClick} 
-        />
+        <SubmitButton text="完了" isSubmit={true} onClick={mockOnClick} />
       );
-      
+
       const button = screen.getByRole('button', { name: '完了' });
       expect(button).toBeInTheDocument();
       expect(button).toHaveAttribute('type', 'submit');
-      
+
       fireEvent.click(button);
       expect(mockOnClick).toHaveBeenCalledTimes(1);
     });
@@ -115,7 +111,7 @@ describe('SubmitButton', () => {
   describe('アクセシビリティ', () => {
     it('ボタンとして適切にアクセス可能', () => {
       render(<SubmitButton text="送信" />);
-      
+
       const button = screen.getByRole('button');
       expect(button).toBeInTheDocument();
       expect(button).toHaveAccessibleName('送信');
@@ -123,10 +119,10 @@ describe('SubmitButton', () => {
 
     it('フォーカス可能である', () => {
       render(<SubmitButton text="送信" />);
-      
+
       const button = screen.getByRole('button');
       button.focus();
-      
+
       expect(button).toHaveFocus();
     });
   });

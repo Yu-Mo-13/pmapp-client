@@ -1,4 +1,4 @@
-import { Application } from "@/api/services/application/applicationService";
+import { Application } from '@/api/services/application/applicationService';
 
 export interface ApplicationTableRowProps {
   application: Partial<Application>;

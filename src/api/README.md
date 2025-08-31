@@ -34,12 +34,12 @@ if (response.success) {
 // POSTリクエスト
 const createResponse = await apiClient.post<User>('/users', {
   name: '田中太郎',
-  email: 'tanaka@example.com'
+  email: 'tanaka@example.com',
 });
 
 // PUTリクエスト
 const updateResponse = await apiClient.put<User>('/users/1', {
-  name: '田中次郎'
+  name: '田中次郎',
 });
 
 // DELETEリクエスト
@@ -64,7 +64,7 @@ if (ApiResponseHandler.isSuccess(response)) {
 // ログイン
 const loginResponse = await UserService.login({
   email: 'user@example.com',
-  password: 'password123'
+  password: 'password123',
 });
 
 if (ApiResponseHandler.isSuccess(loginResponse)) {
@@ -103,7 +103,7 @@ if (ApiResponseHandler.isSuccess(response)) {
 } else {
   // エラー時の処理
   const errorMessage = ApiResponseHandler.getErrorMessage(response);
-  
+
   // 特定のエラータイプの判定
   if (ApiResponseHandler.isNotFoundError(response)) {
     console.log('ユーザーが見つかりません');
@@ -139,9 +139,9 @@ apiClient.setAuthToken('your-jwt-token');
 ```typescript
 const response = await apiClient.get('/users', {
   headers: {
-    'X-Custom-Header': 'value'
+    'X-Custom-Header': 'value',
   },
-  timeout: 5000
+  timeout: 5000,
 });
 ```
 
@@ -180,7 +180,7 @@ export class OrderService {
   static async getOrders(): Promise<ApiResponse<Order[]>> {
     return apiClient.get<Order[]>('/orders');
   }
-  
+
   // その他のメソッド...
 }
 ```

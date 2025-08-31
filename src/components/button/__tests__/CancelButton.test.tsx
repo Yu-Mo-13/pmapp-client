@@ -5,14 +5,14 @@ describe('CancelButton', () => {
   describe('レンダリング', () => {
     it('キャンセルテキストが表示される', () => {
       render(<CancelButton to="/test" />);
-      
+
       const link = screen.getByRole('link', { name: 'キャンセル' });
       expect(link).toBeInTheDocument();
     });
 
     it('適切なスタイリングが適用される', () => {
       render(<CancelButton to="/test" />);
-      
+
       const link = screen.getByRole('link');
       expect(link).toHaveClass(
         'px-8',
@@ -37,28 +37,28 @@ describe('CancelButton', () => {
   describe('ナビゲーション', () => {
     it('指定されたパスへのリンクが設定される', () => {
       render(<CancelButton to="/applications" />);
-      
+
       const link = screen.getByRole('link');
       expect(link).toHaveAttribute('href', '/applications');
     });
 
     it('ルートパスへのリンクが設定される', () => {
       render(<CancelButton to="/" />);
-      
+
       const link = screen.getByRole('link');
       expect(link).toHaveAttribute('href', '/');
     });
 
     it('相対パスが正しく設定される', () => {
       render(<CancelButton to="../parent" />);
-      
+
       const link = screen.getByRole('link');
       expect(link).toHaveAttribute('href', '../parent');
     });
 
     it('クエリパラメータ付きパスが正しく設定される', () => {
       render(<CancelButton to="/search?q=test&page=1" />);
-      
+
       const link = screen.getByRole('link');
       expect(link).toHaveAttribute('href', '/search?q=test&page=1');
     });
@@ -67,7 +67,7 @@ describe('CancelButton', () => {
   describe('アクセシビリティ', () => {
     it('リンクとして適切にアクセス可能', () => {
       render(<CancelButton to="/test" />);
-      
+
       const link = screen.getByRole('link');
       expect(link).toBeInTheDocument();
       expect(link).toHaveAccessibleName('キャンセル');
@@ -75,19 +75,19 @@ describe('CancelButton', () => {
 
     it('フォーカス可能である', () => {
       render(<CancelButton to="/test" />);
-      
+
       const link = screen.getByRole('link');
       link.focus();
-      
+
       expect(link).toHaveFocus();
     });
 
     it('キーボードナビゲーションが可能', () => {
       render(<CancelButton to="/test" />);
-      
+
       const link = screen.getByRole('link');
       expect(link).toHaveAttribute('href');
-      
+
       // Linkコンポーネントはデフォルトでキーボードアクセス可能
       expect(link.tagName.toLowerCase()).toBe('a');
     });
@@ -98,7 +98,7 @@ describe('CancelButton', () => {
       // TypeScriptの型チェックでtoプロパティが必須であることを確認
       // この部分は実際にはコンパイル時にチェックされる
       render(<CancelButton to="/required-prop" />);
-      
+
       const link = screen.getByRole('link');
       expect(link).toHaveAttribute('href', '/required-prop');
     });
@@ -107,7 +107,7 @@ describe('CancelButton', () => {
   describe('Next.js Link integration', () => {
     it('Next.js Linkコンポーネントとして動作する', () => {
       render(<CancelButton to="/next-link-test" />);
-      
+
       const link = screen.getByRole('link');
       // Next.js Linkコンポーネントはaタグとしてレンダリングされる
       expect(link.tagName.toLowerCase()).toBe('a');
@@ -118,7 +118,7 @@ describe('CancelButton', () => {
   describe('ユーザビリティ', () => {
     it('ボタンらしい見た目を持つ', () => {
       render(<CancelButton to="/test" />);
-      
+
       const link = screen.getByRole('link');
       // ボタンらしいスタイリングの確認
       expect(link).toHaveClass('px-8', 'py-3', 'border', 'rounded-md');
@@ -127,15 +127,19 @@ describe('CancelButton', () => {
 
     it('ホバー効果とフォーカス効果を持つ', () => {
       render(<CancelButton to="/test" />);
-      
+
       const link = screen.getByRole('link');
       expect(link).toHaveClass('hover:bg-gray-50');
-      expect(link).toHaveClass('focus:outline-none', 'focus:ring-2', 'focus:ring-gray-500');
+      expect(link).toHaveClass(
+        'focus:outline-none',
+        'focus:ring-2',
+        'focus:ring-gray-500'
+      );
     });
 
     it('適切なテキストサイズとパディングを持つ', () => {
       render(<CancelButton to="/test" />);
-      
+
       const link = screen.getByRole('link');
       expect(link).toHaveClass('text-[18px]', 'px-8', 'py-3');
     });

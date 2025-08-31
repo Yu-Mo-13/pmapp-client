@@ -12,20 +12,20 @@ interface NumberInputProps {
   step?: number;
 }
 
-const NumberInput: React.FC<NumberInputProps> = ({ 
-  name, 
-  defaultValue = 10, 
-  min = 1, 
-  step = 1 
+const NumberInput: React.FC<NumberInputProps> = ({
+  name,
+  defaultValue = 10,
+  min = 1,
+  step = 1,
 }) => {
   const [value, setValue] = useState(defaultValue);
 
   const handleIncrement = () => {
-    setValue(prev => prev + step);
+    setValue((prev) => prev + step);
   };
 
   const handleDecrement = () => {
-    setValue(prev => Math.max(min, prev - step));
+    setValue((prev) => Math.max(min, prev - step));
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
