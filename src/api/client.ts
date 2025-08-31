@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
-import { ApiError, ApiResponse, RequestConfig, ValidationErrorResponse, ErrorResponseData, RequestData } from './types';
+import { ApiError, ApiResponse, RequestConfig, ErrorResponseData, RequestData } from './types';
 
 class ApiClient {
   private instance: AxiosInstance;
@@ -80,12 +80,12 @@ class ApiClient {
         };
 
       case 422:
-        // バリデーションエラー
-        const validationError = responseData as ValidationErrorResponse;
+        // バリデーションエラー - 詳細情報を保持
         return {
-          message: validationError?.message || '入力データに問題があります。',
+          message: responseData?.message || '入力データに問題があります。',
           status,
           code: 'VALIDATION_ERROR',
+          validationErrors: responseData, // バリデーションエラーの詳細を保持
         };
 
       case 500:

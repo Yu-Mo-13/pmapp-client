@@ -47,6 +47,15 @@ export class ApplicationService {
   }
 
   static async create(request: ApplicationCreateRequest): Promise<ApplicationCreateApiResponse> {
-    return apiClient.post('/applications', request);
+    const response = await apiClient.post('/applications', request);
+    
+    // エラーレスポンスかつ422エラーの場合、バリデーションエラーとして処理
+    if (!response.success && response.error?.status === 422 && response.error.validationErrors) {
+      return {
+        errors: response.error.validationErrors as ApplicationCreateValidationError
+      };
+    }
+    
+    return response;
   }
 }

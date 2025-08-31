@@ -1,15 +1,24 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useActionState } from 'react';
+import { useRouter } from 'next/navigation';
 import CancelButton from '@/components/button/CancelButton';
 import ToggleButton from '@/components/ToggleButton';
 import NumberInput from '@/components/NumberInput';
 import { createApplication, FormState } from './actions';
 
 const ApplicationForm: React.FC = () => {
-  const initialState: FormState = { errors: undefined, success: false };
+  const router = useRouter();
+  const initialState: FormState = { errors: undefined, success: false, shouldRedirect: false };
   const [state, formAction] = useActionState(createApplication, initialState);
+
+  // 成功時のリダイレクト処理
+  useEffect(() => {
+    if (state.shouldRedirect) {
+      router.push('/applications');
+    }
+  }, [state.shouldRedirect, router]);
 
   return (
     <form action={formAction} className="px-6 space-y-6 text-[20px]">

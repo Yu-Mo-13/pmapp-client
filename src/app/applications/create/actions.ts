@@ -1,11 +1,11 @@
 'use server';
 
-import { redirect } from 'next/navigation';
 import { ApplicationService, ApplicationCreateValidationError } from '@/api/services/application/applicationService';
 
 export interface FormState {
   errors?: ApplicationCreateValidationError;
   success?: boolean;
+  shouldRedirect?: boolean;
 }
 
 export async function createApplication(prevState: FormState, formData: FormData): Promise<FormState> {
@@ -14,6 +14,8 @@ export async function createApplication(prevState: FormState, formData: FormData
   const noticeClass = formData.get('notice_class') === 'on';
   const markClass = formData.get('mark_class') === 'on';
   const prePasswordSize = parseInt(formData.get('pre_password_size') as string) || 10;
+  
+  console.log('Form data:', { name, accountClass, noticeClass, markClass, prePasswordSize });
   
   try {
     const response = await ApplicationService.create({
@@ -26,21 +28,32 @@ export async function createApplication(prevState: FormState, formData: FormData
       }
     });
     
+    console.log('API Response:', response);
+    
     if ('errors' in response && response.errors) {
+      console.log('Validation errors found:', response.errors);
       return {
         errors: response.errors,
-        success: false
+        success: false,
+        shouldRedirect: false
       };
-    } else {
-      redirect('/applications');
     }
+    
+    console.log('Success - redirecting');
+    // 成功時はリダイレクトフラグを返す
+    return {
+      success: true,
+      shouldRedirect: true
+    };
+    
   } catch (error) {
     console.error('Application creation failed:', error);
     return {
       errors: {
-        application: { name: ['登録に失敗しました。再度お試しください。'] }
+        application: { name: ['サーバーエラーが発生しました。再度お試しください。'] }
       },
-      success: false
+      success: false,
+      shouldRedirect: false
     };
   }
 }
