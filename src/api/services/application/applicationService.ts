@@ -25,8 +25,8 @@ export type ApplicationIndexResponse = {
   data: Application[];
 };
 
-export type ApplicationShowResponse = {
-  application: Application & { pre_password_size: number };
+export type ApplicationShowResponse = Application & {
+  pre_password_size: number;
 };
 
 export type ApplicationCreateResponse = unknown;

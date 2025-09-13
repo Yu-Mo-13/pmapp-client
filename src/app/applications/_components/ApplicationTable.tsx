@@ -20,7 +20,7 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
             </Th>
 
             <Th className="border-r" style={headerStyle}>
-              記号区分
+              アカウント区分
             </Th>
 
             <Th className="border-r" style={headerStyle}>
@@ -28,7 +28,7 @@ const ApplicationTable: React.FC<ApplicationTableProps> = ({
             </Th>
 
             <Th className="border-r" style={headerStyle}>
-              アカウント区分
+              記号区分
             </Th>
 
             <Th style={headerStyle}>{''}</Th>
