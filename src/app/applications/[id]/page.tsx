@@ -5,22 +5,26 @@ import { ApplicationService } from '@/api';
 import ApplicationEditForm from './_components/ApplicationEditForm';
 
 type ApplicationEditPageProps = {
-  params: {
-    id: number;
-  };
+  params: Promise<{
+    id: string;
+  }>;
 };
 
 const ApplicationEditPage: React.FC<ApplicationEditPageProps> = async ({
   params,
 }) => {
+  // paramsをawaitで取得
+  const { id } = await params;
+
   // サーバーサイドでアプリケーション情報を取得
-  const res = await ApplicationService.show(params.id);
+  const res = await ApplicationService.show(Number(id));
   const application = res.data;
 
   // 更新処理のServer Action
-  const updateApplication = async (_formData: FormData) => {
+  const updateApplication = async (formData: FormData) => {
     'use server';
     // ここで実際の更新処理を実装
+    console.log('Form data:', formData);
     redirect('/applications');
   };
 
