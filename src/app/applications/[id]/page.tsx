@@ -1,15 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import ToggleOff from '@/assets/images/toggle/toggleOff.svg';
-// import ToggleOn from '@/assets/images/toggle/toggleOn.svg';
+import ToggleOn from '@/assets/images/toggle/toggleOn.svg';
 import ArrowUp from '@/assets/images/arrow/arrowUp.svg';
 import ArrowDown from '@/assets/images/arrow/arrowDown.svg';
 import { redirect } from 'next/navigation';
 import CancelButton from '@/components/button/CancelButton';
 import SubmitButton from '@/components/button/SubmitButton';
 import Title from '@/components/Title';
+import { ApplicationService } from '@/api';
+import { ApplicationShowResponse } from '@/api/services/application/applicationService';
 
-const ApplicationEditPage: React.FC = () => {
+type ApplicationEditPageProps = {
+  params: {
+    id: number;
+  };
+};
+
+const ApplicationEditPage: React.FC<ApplicationEditPageProps> = ({
+  params,
+}) => {
+  const [application, setApplication] = useState<ApplicationShowResponse>();
+  const fetchApplication = async (id: number) => {
+    const res = await ApplicationService.show(id);
+    setApplication(res.data);
+  };
+
+  // 初回レンダリング時にアプリケーション情報を取得
+  React.useEffect(() => {
+    fetchApplication(params.id);
+  }, [params.id]);
+
+  // 更新ボタン押下時の処理
   const handleRegistClick = async () => {
     'use server';
     redirect('/applications');
@@ -35,7 +57,17 @@ const ApplicationEditPage: React.FC = () => {
           </div>
           <input
             type="text"
+            value={application?.name || ''}
             className="w-[97%] m-4 text-black px-4 py-3 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+            onChange={(e) => {
+              setApplication((prev) => {
+                if (!prev) return prev;
+                return {
+                  ...prev,
+                  name: e.target.value,
+                };
+              });
+            }}
           />
         </div>
 
@@ -46,7 +78,12 @@ const ApplicationEditPage: React.FC = () => {
           </label>
           <div className="flex items-center">
             <button type="button" className="mb-3">
-              <Image src={ToggleOff} alt="Toggle Off" width={44} height={24} />
+              <Image
+                src={application?.account_class ? ToggleOn : ToggleOff}
+                alt="Toggle Off"
+                width={44}
+                height={24}
+              />
             </button>
           </div>
         </div>
@@ -56,7 +93,12 @@ const ApplicationEditPage: React.FC = () => {
           <label className="text-gray-700 font-medium mb-3">定期通知区分</label>
           <div className="flex items-center">
             <button type="button" className="mb-3">
-              <Image src={ToggleOff} alt="Toggle Off" width={44} height={24} />
+              <Image
+                src={application?.notice_class ? ToggleOn : ToggleOff}
+                alt="Toggle Off"
+                width={44}
+                height={24}
+              />
             </button>
           </div>
         </div>
@@ -66,7 +108,12 @@ const ApplicationEditPage: React.FC = () => {
           <label className="text-gray-700 font-medium mb-3">記号区分</label>
           <div className="flex items-center">
             <button type="button" className="mb-3">
-              <Image src={ToggleOff} alt="Toggle Off" width={44} height={24} />
+              <Image
+                src={application?.mark_class ? ToggleOn : ToggleOff}
+                alt="Toggle Off"
+                width={44}
+                height={24}
+              />
             </button>
           </div>
         </div>
@@ -79,9 +126,19 @@ const ApplicationEditPage: React.FC = () => {
           <div className="relative flex items-center">
             <input
               type="number"
-              defaultValue={10}
+              defaultValue={application?.pre_password_size || 10}
               min={1}
               step={1}
+              onChange={(e) => {
+                const value = Math.max(1, Math.floor(Number(e.target.value)));
+                setApplication((prev) => {
+                  if (!prev) return prev;
+                  return {
+                    ...prev,
+                    pre_password_size: value,
+                  };
+                });
+              }}
               className="px-4 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent bg-white w-24 pr-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
             <div className="absolute right-1 flex flex-col">
