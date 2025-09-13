@@ -28,7 +28,7 @@ const ApplicationEditPage: React.FC<ApplicationEditPageProps> = async ({
     <main className="flex-1 p-6">
       {/* ヘッダー部分 */}
       <div className="flex justify-between items-center mb-8">
-        <Title title="アプリケーション編集" />
+        <Title title="アプリケーション情報の編集" />
       </div>
 
       {/* フォーム部分 */}

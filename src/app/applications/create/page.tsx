@@ -7,7 +7,7 @@ const ApplicationCreatePage: React.FC = () => {
     <main className="flex-1 p-6">
       {/* ヘッダー部分 */}
       <div className="flex justify-between items-center mb-8">
-        <Title title="アプリケーション新規登録" />
+        <Title title="アプリケーションの新規登録" />
       </div>
 
       {/* フォーム部分 */}
