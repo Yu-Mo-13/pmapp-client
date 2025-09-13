@@ -23,7 +23,7 @@ const ApplicationTr: React.FC<ApplicationTableRowProps> = ({ application }) => {
       </Td>
 
       <Td className="border-r text-center" style={borderStyle}>
-        {application.mark_class ? 'あり' : 'なし'}
+        {application.account_class ? 'あり' : 'なし'}
       </Td>
 
       <Td className="border-r text-center" style={borderStyle}>
@@ -31,7 +31,7 @@ const ApplicationTr: React.FC<ApplicationTableRowProps> = ({ application }) => {
       </Td>
 
       <Td className="border-r text-center" style={borderStyle}>
-        {application.account_class ? 'あり' : 'なし'}
+        {application.mark_class ? 'あり' : 'なし'}
       </Td>
 
       <Td className="text-center">
