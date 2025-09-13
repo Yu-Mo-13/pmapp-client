@@ -25,6 +25,10 @@ export type ApplicationIndexResponse = {
   data: Application[];
 };
 
+export type ApplicationShowResponse = {
+  application: Application & { pre_password_size: number };
+};
+
 export type ApplicationCreateResponse = unknown;
 
 export interface ApplicationCreateValidationError {
@@ -47,6 +51,10 @@ export type ApplicationCreateApiResponse =
 export class ApplicationService {
   static async index(): Promise<ApiResponse<ApplicationIndexResponse>> {
     return apiClient.get('/applications');
+  }
+
+  static async show(id: number): Promise<ApiResponse<ApplicationShowResponse>> {
+    return apiClient.get(`/applications/${id}`);
   }
 
   static async create(
