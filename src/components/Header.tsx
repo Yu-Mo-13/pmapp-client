@@ -8,7 +8,7 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
   return (
     <header
       className="text-white p-4 flex justify-between items-center w-full"
-      style={{backgroundColor: '#3E3E3E'}}
+      style={{ backgroundColor: '#3E3E3E' }}
     >
       <h1 className="text-xl font-bold">{appName}</h1>
       <span className="text-xl">{props.userName}</span>

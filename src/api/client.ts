@@ -1,11 +1,20 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
-import { ApiError, ApiResponse, RequestConfig, ValidationErrorResponse, ErrorResponseData, RequestData } from './types';
+import {
+  ApiError,
+  ApiResponse,
+  RequestConfig,
+  ErrorResponseData,
+  RequestData,
+} from './types';
 
 class ApiClient {
   private instance: AxiosInstance;
   private baseURL: string;
 
-  constructor(baseURL: string = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8080/api/v2/') {
+  constructor(
+    baseURL: string = process.env.NEXT_PUBLIC_API_BASE_URL ||
+      'http://localhost:8080/api/v2/'
+  ) {
     this.baseURL = baseURL;
     this.instance = axios.create({
       baseURL,
@@ -51,7 +60,9 @@ class ApiClient {
     return null;
   }
 
-  private handleError(error: AxiosError): ApiError {
+  private handleError(
+    error: AxiosError
+  ): ApiError & { validationErrors?: unknown } {
     const status = error.response?.status || 500;
     const responseData = error.response?.data as ErrorResponseData;
 
@@ -80,24 +91,26 @@ class ApiClient {
         };
 
       case 422:
-        // バリデーションエラー
-        const validationError = responseData as ValidationErrorResponse;
+        // バリデーションエラー - レスポンスデータも含める
         return {
-          message: validationError?.message || '入力データに問題があります。',
+          message: responseData?.message || '入力データに問題があります。',
           status,
           code: 'VALIDATION_ERROR',
+          validationErrors: responseData, // バリデーションエラーの詳細を保持
         };
 
       case 500:
         return {
-          message: 'サーバーエラーが発生しました。しばらく時間をおいてから再度お試しください。',
+          message:
+            'サーバーエラーが発生しました。しばらく時間をおいてから再度お試しください。',
           status,
           code: 'INTERNAL_SERVER_ERROR',
         };
 
       default:
         return {
-          message: responseData?.message || error.message || 'エラーが発生しました。',
+          message:
+            responseData?.message || error.message || 'エラーが発生しました。',
           status,
           code: 'UNKNOWN_ERROR',
         };
@@ -146,8 +159,19 @@ class ApiClient {
         success: true,
       };
     } catch (error) {
+      const apiError = error as ApiError & { validationErrors?: unknown };
+
+      // 422エラーの場合はvalidationErrorsも含める
+      if (apiError.status === 422 && apiError.validationErrors) {
+        return {
+          error: apiError,
+          validationErrors: apiError.validationErrors,
+          success: false,
+        };
+      }
+
       return {
-        error: error as ApiError,
+        error: apiError,
         success: false,
       };
     }
@@ -163,21 +187,32 @@ class ApiClient {
   /**
    * POST リクエスト
    */
-  async post<T>(url: string, data?: RequestData, config?: RequestConfig): Promise<ApiResponse<T>> {
+  async post<T>(
+    url: string,
+    data?: RequestData,
+    config?: RequestConfig
+  ): Promise<ApiResponse<T>> {
     return this.makeRequest<T>('post', url, data, config);
   }
 
   /**
    * PUT リクエスト
    */
-  async put<T>(url: string, data?: RequestData, config?: RequestConfig): Promise<ApiResponse<T>> {
+  async put<T>(
+    url: string,
+    data?: RequestData,
+    config?: RequestConfig
+  ): Promise<ApiResponse<T>> {
     return this.makeRequest<T>('put', url, data, config);
   }
 
   /**
    * DELETE リクエスト
    */
-  async delete<T>(url: string, config?: RequestConfig): Promise<ApiResponse<T>> {
+  async delete<T>(
+    url: string,
+    config?: RequestConfig
+  ): Promise<ApiResponse<T>> {
     return this.makeRequest<T>('delete', url, undefined, config);
   }
 

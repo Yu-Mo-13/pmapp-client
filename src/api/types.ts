@@ -7,6 +7,7 @@ export interface ApiError {
 export interface ApiResponse<T = unknown> {
   data?: T;
   error?: ApiError;
+  validationErrors?: unknown; // バリデーションエラーの詳細
   success: boolean;
 }
 
@@ -33,4 +34,11 @@ export interface ErrorResponseData {
   [key: string]: unknown;
 }
 
-export type RequestData = Record<string, unknown> | unknown[] | FormData | string | number | boolean | null;
+export type RequestData =
+  | Record<string, unknown>
+  | unknown[]
+  | FormData
+  | string
+  | number
+  | boolean
+  | null;
