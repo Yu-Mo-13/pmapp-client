@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import SubmitButton from '../button/SubmitButton';
 import { CloseButton } from '../button/CloseButton';
+import { ErrorMessage } from '../form/ErrorMessage';
 
 type ConfirmModalProps = {
   isOpen: boolean;
@@ -60,7 +61,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
     if (inputValue.trim() === passphrase) {
       onConfirm();
     } else {
-      setError('入力された合言葉が正しくありません。');
+      setError('指定されたパスフレーズを入力してください。');
     }
   };
 
@@ -70,7 +71,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500 bg-opacity-70"
       onClick={onCancel}
       aria-modal="true"
       role="dialog"
@@ -79,17 +80,9 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
         className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 transform transition-all"
         onClick={handleModalContentClick}
       >
-        <h2 className="text-xl font-bold mb-4 text-gray-900">{title}</h2>
-        <p className="text-gray-700 mb-4">{message}</p>
+        <h2 className="text-xl font-bold mb-4 text-black">{title}</h2>
+        <p className="text-black mb-4">{message}</p>
         <div className="mb-4">
-          <label
-            htmlFor="passphrase-input"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            この操作を確定するには、「
-            <span className="font-bold">{passphrase}</span>
-            」と入力してください。
-          </label>
           <input
             ref={inputRef}
             id="passphrase-input"
@@ -107,9 +100,9 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
               }
             }}
             placeholder={passphrase}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 border text-black border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3CB371] focus:border-[#3CB371]"
           />
-          {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
+          {error && <ErrorMessage message={error} />}
         </div>
         <div className="flex justify-end space-x-3 mt-6">
           <CloseButton onClick={onCancel}>キャンセル</CloseButton>
