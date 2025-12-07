@@ -71,13 +71,13 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500 bg-opacity-70"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/50"
       onClick={onCancel}
       aria-modal="true"
       role="dialog"
     >
       <div
-        className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4 transform transition-all"
+        className="bg-white rounded-md shadow-xl p-6 w-full max-w-md mx-4 transform transition-all"
         onClick={handleModalContentClick}
       >
         <h2 className="text-xl font-bold mb-4 text-black">{title}</h2>
@@ -100,7 +100,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
               }
             }}
             placeholder={passphrase}
-            className="w-full px-3 py-2 border text-black border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3CB371] focus:border-[#3CB371]"
+            className="w-full px-3 py-2 border text-black border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-[#3CB371] focus:border-[#3CB371]"
           />
           {error && <ErrorMessage message={error} />}
         </div>

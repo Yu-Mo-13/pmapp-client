@@ -183,7 +183,7 @@ const ApplicationEditForm: React.FC<ApplicationEditFormProps> = ({
       </form>
       <ConfirmModal
         isOpen={isDeleteModalOpen}
-        title={`アプリケーション ${initialApplication.name} を削除します`}
+        title={`${initialApplication.name} を削除します`}
         message={`このアプリケーションを削除する場合は、「delete」を入力してください。`}
         passphrase="delete"
         onConfirm={handleDeleteConfirm}
