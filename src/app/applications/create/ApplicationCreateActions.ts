@@ -2,11 +2,11 @@
 
 import {
   ApplicationService,
-  ApplicationCreateValidationError,
+  ApplicationValidationError,
 } from '@/api/services/application/applicationService';
 
 export interface FormState {
-  errors?: ApplicationCreateValidationError;
+  errors?: ApplicationValidationError;
   success?: boolean;
   shouldRedirect?: boolean;
 }

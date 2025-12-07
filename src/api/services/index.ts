@@ -24,7 +24,7 @@ export type {
   ApplicationCreateRequest,
   ApplicationIndexResponse,
   ApplicationCreateResponse,
-  ApplicationCreateValidationError,
+  ApplicationValidationError,
   ApplicationCreateApiResponse,
 } from './application/applicationService';
 
