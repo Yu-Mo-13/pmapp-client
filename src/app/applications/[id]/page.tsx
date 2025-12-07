@@ -1,5 +1,5 @@
 import React from 'react';
-import { redirect } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import Title from '@/components/Title';
 import { ApplicationService } from '@/api';
 import ApplicationEditForm from './_components/ApplicationEditForm';
@@ -23,8 +23,20 @@ const ApplicationEditPage: React.FC<ApplicationEditPageProps> = async ({
   // 更新処理のServer Action
   const updateApplication = async (formData: FormData) => {
     'use server';
-    // ここで実際の更新処理を実装
-    console.log('Form data:', formData);
+
+    const TOGGLE_ON = '1';
+    const request = {
+      application: {
+        name: formData.get('name') as string,
+        account_class: formData.get('account_class') === TOGGLE_ON,
+        notice_class: formData.get('notice_class') === TOGGLE_ON,
+        mark_class: formData.get('mark_class') === TOGGLE_ON,
+        pre_password_size: Number(formData.get('pre_password_size')),
+      },
+    };
+
+    await ApplicationService.update(Number(id), request);
+
     redirect('/applications');
   };
 
