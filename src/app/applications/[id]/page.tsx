@@ -1,5 +1,4 @@
 import React from 'react';
-import { redirect } from 'next/navigation';
 import Title from '@/components/Title';
 import { ApplicationService } from '@/api';
 import ApplicationEditForm from './_components/ApplicationEditForm';
@@ -20,14 +19,6 @@ const ApplicationEditPage: React.FC<ApplicationEditPageProps> = async ({
   const res = await ApplicationService.show(Number(id));
   const application = res.data;
 
-  // 更新処理のServer Action
-  const updateApplication = async (formData: FormData) => {
-    'use server';
-    // ここで実際の更新処理を実装
-    console.log('Form data:', formData);
-    redirect('/applications');
-  };
-
   return (
     <main className="flex-1 p-6">
       {/* ヘッダー部分 */}
@@ -36,12 +27,7 @@ const ApplicationEditPage: React.FC<ApplicationEditPageProps> = async ({
       </div>
 
       {/* フォーム部分 */}
-      {application && (
-        <ApplicationEditForm
-          application={application}
-          updateAction={updateApplication}
-        />
-      )}
+      {application && <ApplicationEditForm application={application} />}
     </main>
   );
 };

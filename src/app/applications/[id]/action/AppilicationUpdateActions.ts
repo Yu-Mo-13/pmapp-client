@@ -11,10 +11,19 @@ export interface FormState {
   shouldRedirect?: boolean;
 }
 
-export async function createApplication(
+export async function updateApplication(
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
+  const id = Number(formData.get('id'));
+  if (!id) {
+    return {
+      errors: { application: { name: ['IDが指定されていません。'] } },
+      success: false,
+      shouldRedirect: false,
+    };
+  }
+
   const TOGGLE_ON = '1';
   const application = {
     application: {
@@ -27,7 +36,7 @@ export async function createApplication(
   };
 
   try {
-    const response = await ApplicationService.create(application);
+    const response = await ApplicationService.update(id, application);
 
     if ('errors' in response && response.errors) {
       return {
@@ -43,7 +52,7 @@ export async function createApplication(
       shouldRedirect: true,
     };
   } catch (error) {
-    console.error('Application creation failed:', error);
+    console.error('Application update failed:', error);
     return {
       errors: {
         application: {

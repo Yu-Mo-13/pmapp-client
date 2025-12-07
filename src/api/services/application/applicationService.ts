@@ -31,7 +31,7 @@ export type ApplicationShowResponse = Application & {
 
 export type ApplicationCreateResponse = unknown;
 
-export interface ApplicationCreateValidationError {
+export interface ApplicationValidationError {
   application?: {
     name?: string[];
     account_class?: string[];
@@ -45,9 +45,28 @@ export interface ApplicationCreateValidationError {
 export type ApplicationCreateApiResponse =
   | ApiResponse<ApplicationCreateResponse>
   | {
-      errors?: ApplicationCreateValidationError;
+      errors?: ApplicationValidationError;
     };
 
+export type ApplicationUpdateResponse = unknown;
+export type ApplicationDeleteResponse = unknown;
+
+export interface ApplicationUpdateRequest {
+  application: {
+    name: string;
+    account_class: boolean;
+    notice_class: boolean;
+    mark_class: boolean;
+    pre_password_size: number;
+  };
+  [key: string]: unknown;
+}
+
+export type ApplicationUpdateApiResponse =
+  | ApiResponse<ApplicationUpdateResponse>
+  | {
+      errors?: ApplicationValidationError;
+    };
 export class ApplicationService {
   static async index(): Promise<ApiResponse<ApplicationIndexResponse>> {
     return apiClient.get('/applications');
@@ -66,10 +85,33 @@ export class ApplicationService {
     if (!response.success && response.validationErrors) {
       const errors = extractValidationErrors(response);
       if (errors) {
-        return { errors: errors as ApplicationCreateValidationError };
+        return { errors: errors as ApplicationValidationError };
       }
     }
 
     return response;
+  }
+
+  static async update(
+    id: number,
+    request: Partial<ApplicationUpdateRequest>
+  ): Promise<ApplicationUpdateApiResponse> {
+    const response = await apiClient.put(`/applications/${id}`, request);
+
+    // バリデーションエラーがある場合は変換して返す
+    if (!response.success && response.validationErrors) {
+      const errors = extractValidationErrors(response);
+      if (errors) {
+        return { errors: errors as ApplicationValidationError };
+      }
+    }
+
+    return response;
+  }
+
+  static async delete(
+    id: number
+  ): Promise<ApiResponse<ApplicationDeleteResponse>> {
+    return apiClient.delete(`/applications/${id}`);
   }
 }
