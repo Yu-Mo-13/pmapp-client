@@ -51,6 +51,17 @@ export type ApplicationCreateApiResponse =
 export type ApplicationUpdateResponse = unknown;
 export type ApplicationDeleteResponse = unknown;
 
+export interface ApplicationUpdateRequest {
+  application: {
+    name: string;
+    account_class: boolean;
+    notice_class: boolean;
+    mark_class: boolean;
+    pre_password_size: number;
+  };
+  [key: string]: unknown;
+}
+
 export type ApplicationUpdateApiResponse =
   | ApiResponse<ApplicationUpdateResponse>
   | {
@@ -83,7 +94,7 @@ export class ApplicationService {
 
   static async update(
     id: number,
-    request: Partial<ApplicationCreateRequest>
+    request: Partial<ApplicationUpdateRequest>
   ): Promise<ApplicationUpdateApiResponse> {
     const response = await apiClient.put(`/applications/${id}`, request);
 
