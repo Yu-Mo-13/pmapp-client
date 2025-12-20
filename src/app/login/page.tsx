@@ -40,7 +40,6 @@ const LoginForm: React.FC = () => {
               type="email"
               id="email"
               name="email"
-              required
               className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#3cb371] focus:border-2 text-base shadow-sm transition duration-150"
               placeholder="メールアドレス"
             />
@@ -61,7 +60,6 @@ const LoginForm: React.FC = () => {
               type="password"
               id="password"
               name="password"
-              required
               className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#3cb371] focus:border-2 text-base shadow-sm transition duration-150"
               placeholder="パスワード"
             />
@@ -72,7 +70,7 @@ const LoginForm: React.FC = () => {
 
           {/* ログインボタン */}
           <div className="text-center">
-            <SubmitButton text="ログイン" />
+            <SubmitButton isSubmit text="ログイン" />
           </div>
         </form>
       </div>
