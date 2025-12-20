@@ -1,52 +1,21 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import SubmitButton from '@/components/button/SubmitButton';
 import { ErrorMessage } from '@/components/form/ErrorMessage';
-import {
-  AuthService,
-  LoginValidationError,
-} from '@/api/services/auth/authService';
+import { loginAction, initialState } from './loginActions'; // loginActionsからインポート
 
 const LoginForm: React.FC = () => {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<LoginValidationError>({});
+  const [state, formAction] = useActionState(loginAction, initialState);
 
-  // フォームの送信処理
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrors({});
-
-    try {
-      const response = await AuthService.login({ email, password });
-
-      // バリデーションエラー
-      if ('errors' in response && response.errors) {
-        setErrors(response.errors);
-        return;
-      }
-
-      // 成功
-      if (
-        'success' in response &&
-        response.success &&
-        response.data?.access_token
-      ) {
-        // 実際にはトークンを保存する処理が必要
-        localStorage.setItem('token', response.data.access_token);
-        router.push('/applications');
-        return;
-      }
-
-      // その他のAPIエラー
-      console.error('Login failed with response:', response);
-    } catch (error) {
-      console.error('An unexpected error occurred during login:', error);
+  useEffect(() => {
+    if (state.shouldRedirect) {
+      // shouldRedirectを監視
+      router.push('/applications');
     }
-  };
+  }, [state.shouldRedirect, router]);
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 bg-[#f0f0f0]">
@@ -58,7 +27,7 @@ const LoginForm: React.FC = () => {
         </h1>
 
         {/* ログインフォーム */}
-        <form onSubmit={handleLogin}>
+        <form action={formAction}>
           {/* メールアドレス入力欄 */}
           <div className="mb-6">
             <label
@@ -71,12 +40,13 @@ const LoginForm: React.FC = () => {
               type="email"
               id="email"
               name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              required
               className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#3cb371] focus:border-2 text-base shadow-sm transition duration-150"
               placeholder="メールアドレス"
             />
-            {errors.email && <ErrorMessage message={errors.email?.[0]} />}
+            {state.errors?.email && (
+              <ErrorMessage message={state.errors?.email?.[0]} />
+            )}
           </div>
 
           {/* パスワード入力欄 */}
@@ -91,17 +61,18 @@ const LoginForm: React.FC = () => {
               type="password"
               id="password"
               name="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              required
               className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#3cb371] focus:border-2 text-base shadow-sm transition duration-150"
               placeholder="パスワード"
             />
-            {errors.password && <ErrorMessage message={errors.password?.[0]} />}
+            {state.errors?.password && (
+              <ErrorMessage message={state.errors?.password?.[0]} />
+            )}
           </div>
 
           {/* ログインボタン */}
           <div className="text-center">
-            <SubmitButton isSubmit text="ログイン" />
+            <SubmitButton text="ログイン" />
           </div>
         </form>
       </div>
