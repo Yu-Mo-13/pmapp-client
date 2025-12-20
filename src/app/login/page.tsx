@@ -4,7 +4,15 @@ import React, { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import SubmitButton from '@/components/button/SubmitButton';
 import { ErrorMessage } from '@/components/form/ErrorMessage';
-import { loginAction, initialState } from './loginActions'; // loginActionsからインポート
+import { loginAction } from './loginActions';
+import type { LoginFormState } from './loginActions';
+
+const initialState: LoginFormState = {
+  errors: {},
+  success: false,
+  message: '',
+  shouldRedirect: false,
+};
 
 const LoginForm: React.FC = () => {
   const router = useRouter();
@@ -12,7 +20,6 @@ const LoginForm: React.FC = () => {
 
   useEffect(() => {
     if (state.shouldRedirect) {
-      // shouldRedirectを監視
       router.push('/applications');
     }
   }, [state.shouldRedirect, router]);

@@ -12,12 +12,6 @@ export interface LoginFormState {
   shouldRedirect?: boolean;
 }
 
-export const initialState: LoginFormState = {
-  errors: undefined,
-  success: false,
-  shouldRedirect: false,
-};
-
 export async function loginAction(
   prevState: LoginFormState,
   formData: FormData
