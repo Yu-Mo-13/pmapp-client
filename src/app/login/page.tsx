@@ -1,40 +1,40 @@
 'use client';
 
-import React from 'react';
+import React, { useActionState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import SubmitButton from '@/components/button/SubmitButton';
+import { ErrorMessage } from '@/components/form/ErrorMessage';
+import { loginAction } from './loginActions';
+import type { LoginFormState } from './loginActions';
+
+const initialState: LoginFormState = {
+  errors: {},
+  success: false,
+  message: '',
+  shouldRedirect: false,
+};
 
 const LoginForm: React.FC = () => {
-  // フォームの送信処理
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('フォームが送信されました。');
-  };
+  const router = useRouter();
+  const [state, formAction] = useActionState(loginAction, initialState);
 
-  // カスタムカラースペック
-  const BG_COLOR = '#f0f0f0';
-  const HEADER_COLOR = '#3e3e3e';
-  const BUTTON_COLOR = '#3cb371';
-  const BUTTON_HOVER_COLOR = '#34a465';
+  useEffect(() => {
+    if (state.shouldRedirect) {
+      router.push('/applications');
+    }
+  }, [state.shouldRedirect, router]);
 
   return (
-    // 修正点:
-    // 1. `w-full` を追加し、親要素の幅を確実に確保します。
-    // 2. `min-h-screen` (画面の最小高さ), `flex`, `items-center` (垂直中央), `justify-center` (水平中央) を適用します。
-    <div
-      style={{ backgroundColor: BG_COLOR }}
-      className="min-h-screen w-full flex items-center justify-center p-4"
-    >
+    <div className="min-h-screen w-full flex items-center justify-center p-4 bg-[#f0f0f0]">
       {/* ログインコンテナ (最大幅 max-w-md によりフォーム自体は小さいまま) */}
       <div className="w-full max-w-md p-8 bg-white/70 rounded shadow-xl backdrop-blur-sm">
         {/* PMAPP 題字 */}
-        <h1
-          style={{ color: HEADER_COLOR }}
-          className="text-4xl font-bold text-center mb-10"
-        >
+        <h1 className="text-4xl font-bold text-center mb-10 text-[#3e3e3e]">
           PMAPP
         </h1>
 
         {/* ログインフォーム */}
-        <form onSubmit={handleSubmit}>
+        <form action={formAction}>
           {/* メールアドレス入力欄 */}
           <div className="mb-6">
             <label
@@ -47,16 +47,12 @@ const LoginForm: React.FC = () => {
               type="email"
               id="email"
               name="email"
-              required
-              style={
-                {
-                  '--tw-ring-color': BUTTON_COLOR,
-                  '--tw-border-color': BUTTON_COLOR,
-                } as React.CSSProperties
-              }
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:border-2 text-base shadow-sm transition duration-150"
-              placeholder=""
+              className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#3cb371] focus:border-2 text-base shadow-sm transition duration-150"
+              placeholder="メールアドレス"
             />
+            {state.errors?.email && (
+              <ErrorMessage message={state.errors?.email?.[0]} />
+            )}
           </div>
 
           {/* パスワード入力欄 */}
@@ -71,33 +67,17 @@ const LoginForm: React.FC = () => {
               type="password"
               id="password"
               name="password"
-              required
-              style={
-                {
-                  '--tw-ring-color': BUTTON_COLOR,
-                  '--tw-border-color': BUTTON_COLOR,
-                } as React.CSSProperties
-              }
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:border-2 text-base shadow-sm transition duration-150"
-              placeholder=""
+              className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#3cb371] focus:border-2 text-base shadow-sm transition duration-150"
+              placeholder="パスワード"
             />
+            {state.errors?.password && (
+              <ErrorMessage message={state.errors?.password?.[0]} />
+            )}
           </div>
 
           {/* ログインボタン */}
           <div className="text-center">
-            <button
-              type="submit"
-              style={{ backgroundColor: BUTTON_COLOR }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor = BUTTON_HOVER_COLOR)
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.backgroundColor = BUTTON_COLOR)
-              }
-              className="w-full max-w-[150px] text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 transition duration-150 ease-in-out text-lg shadow-md"
-            >
-              ログイン
-            </button>
+            <SubmitButton isSubmit text="ログイン" />
           </div>
         </form>
       </div>
