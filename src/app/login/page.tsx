@@ -1,14 +1,51 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import SubmitButton from '@/components/button/SubmitButton';
 import { ErrorMessage } from '@/components/form/ErrorMessage';
+import {
+  AuthService,
+  LoginValidationError,
+} from '@/api/services/auth/authService';
 
 const LoginForm: React.FC = () => {
+  const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState<LoginValidationError>({});
+
   // フォームの送信処理
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('フォームが送信されました。');
+    setErrors({});
+
+    try {
+      const response = await AuthService.login({ email, password });
+
+      // バリデーションエラー
+      if ('errors' in response && response.errors) {
+        setErrors(response.errors);
+        return;
+      }
+
+      // 成功
+      if (
+        'success' in response &&
+        response.success &&
+        response.data?.access_token
+      ) {
+        // 実際にはトークンを保存する処理が必要
+        localStorage.setItem('token', response.data.access_token);
+        router.push('/applications');
+        return;
+      }
+
+      // その他のAPIエラー
+      console.error('Login failed with response:', response);
+    } catch (error) {
+      console.error('An unexpected error occurred during login:', error);
+    }
   };
 
   return (
@@ -34,11 +71,12 @@ const LoginForm: React.FC = () => {
               type="email"
               id="email"
               name="email"
-              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#3cb371] focus:border-2 text-base shadow-sm transition duration-150"
               placeholder="メールアドレス"
             />
-            <ErrorMessage message="メールアドレスのバリデーションエラー" />
+            {errors.email && <ErrorMessage message={errors.email?.[0]} />}
           </div>
 
           {/* パスワード入力欄 */}
@@ -53,16 +91,17 @@ const LoginForm: React.FC = () => {
               type="password"
               id="password"
               name="password"
-              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#3cb371] focus:border-2 text-base shadow-sm transition duration-150"
               placeholder="パスワード"
             />
-            <ErrorMessage message="パスワードのバリデーションエラー" />
+            {errors.password && <ErrorMessage message={errors.password?.[0]} />}
           </div>
 
           {/* ログインボタン */}
           <div className="text-center">
-            <SubmitButton text="ログイン" />
+            <SubmitButton isSubmit text="ログイン" />
           </div>
         </form>
       </div>
