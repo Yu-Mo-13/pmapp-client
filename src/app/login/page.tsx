@@ -2,6 +2,7 @@
 
 import React from 'react';
 import SubmitButton from '@/components/button/SubmitButton';
+import { ErrorMessage } from '@/components/form/ErrorMessage';
 
 const LoginForm: React.FC = () => {
   // フォームの送信処理
@@ -37,6 +38,7 @@ const LoginForm: React.FC = () => {
               className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#3cb371] focus:border-2 text-base shadow-sm transition duration-150"
               placeholder="メールアドレス"
             />
+            <ErrorMessage message="メールアドレスのバリデーションエラー" />
           </div>
 
           {/* パスワード入力欄 */}
@@ -55,6 +57,7 @@ const LoginForm: React.FC = () => {
               className="text-black w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#3cb371] focus:border-2 text-base shadow-sm transition duration-150"
               placeholder="パスワード"
             />
+            <ErrorMessage message="パスワードのバリデーションエラー" />
           </div>
 
           {/* ログインボタン */}
