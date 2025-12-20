@@ -26,7 +26,6 @@ export async function loginAction(
   const password = formData.get('password') as string;
 
   try {
-    console.log(email);
     const response = await AuthService.login({ email, password });
 
     if ('errors' in response && response.errors) {
