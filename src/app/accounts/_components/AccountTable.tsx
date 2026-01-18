@@ -21,11 +21,13 @@ const AccountTable: React.FC<AccountTableProps> = ({ accounts }) => {
               アプリケーション
             </Th>
 
-            <Th className="border-r" style={headerStyle}>
+            <Th className="border-r w-[400px]" style={headerStyle}>
               変更通知区分
             </Th>
 
-            <Th style={headerStyle}>{''}</Th>
+            <Th className="w-[300px]" style={headerStyle}>
+              {''}
+            </Th>
           </TableRowWrapper>
         </thead>
         <tbody className="divide-y divide-gray-200">
