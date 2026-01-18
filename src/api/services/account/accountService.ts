@@ -10,7 +10,9 @@ export interface Account {
   notice_class: boolean;
 }
 
-export type AccountIndexResponse = Account[];
+export type AccountIndexResponse = {
+  data: Account[];
+};
 
 export class AccountService {
   static async index(): Promise<ApiResponse<AccountIndexResponse>> {
