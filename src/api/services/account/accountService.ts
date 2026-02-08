@@ -22,8 +22,34 @@ export type AccountShowResponse = Account & {
   application: ApplicationShowResponse;
 };
 
+export interface AccountCreateRequest {
+  account: {
+    name: string;
+    application_id: number;
+    notice_class: boolean;
+  };
+  [key: string]: unknown;
+}
+
+export interface AccountCreateValidationError {
+  account?: {
+    name?: string[];
+    application_id?: string[];
+    notice_class?: string[];
+  };
+  [key: string]: unknown;
+}
+
+export type AccountCreateResponse = unknown;
+
+export type AccountCreateApiResponse =
+  | ApiResponse<AccountCreateResponse>
+  | {
+      errors?: AccountCreateValidationError;
+    };
+
 export interface AccountUpdateRequest {
-  application: {
+  account: {
     name: string;
     notice_class: boolean;
   };
@@ -60,6 +86,20 @@ export class AccountService {
     config?: RequestConfig
   ): Promise<ApiResponse<AccountShowResponse>> {
     return apiClient.get(`/accounts/${id}`, config);
+  }
+
+  static async create(
+    request: Partial<AccountCreateRequest>
+  ): Promise<AccountCreateApiResponse> {
+    const res = await apiClient.post('/accounts', request);
+
+    if (!res.success && res.validationErrors) {
+      const errors = extractValidationErrors(res);
+      if (errors) {
+        return { errors: errors as AccountCreateValidationError };
+      }
+    }
+    return res;
   }
 
   static async update(
