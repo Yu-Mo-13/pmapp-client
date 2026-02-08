@@ -1,6 +1,6 @@
 import React from 'react';
 import Title from '@/components/Title';
-// import AccountForm from './AccountForm';
+import AccountForm from './_components/AccountForm';
 
 const AccountCreatePage: React.FC = () => {
   return (
@@ -11,7 +11,7 @@ const AccountCreatePage: React.FC = () => {
       </div>
 
       {/* フォーム部分 */}
-      {/* <AccountForm /> */}
+      <AccountForm />
     </main>
   );
 };
