@@ -1,7 +1,7 @@
 import apiClient from '../../client';
 import { ApiResponse } from '../../types';
 import { ApplicationShowResponse } from '../application/applicationService';
-// import { extractValidationErrors } from '../../utils/validationErrorTransformer';
+import { extractValidationErrors } from '../../utils/validationErrorTransformer';
 
 export interface Account {
   id: number;
@@ -19,6 +19,30 @@ export type AccountShowResponse = Account & {
   application: ApplicationShowResponse;
 };
 
+export interface AccountUpdateRequest {
+  application: {
+    name: string;
+    notice_class: boolean;
+  };
+  [key: string]: unknown;
+}
+
+export interface AccountUpdateValidationError {
+  account?: {
+    name?: string[];
+    notice_class?: string[];
+  };
+  [key: string]: unknown;
+}
+
+export type AccountUpdateResponse = unknown;
+
+export type AccountUpdateApiResponse =
+  | ApiResponse<AccountUpdateResponse>
+  | {
+      errors?: AccountUpdateValidationError;
+    };
+
 export class AccountService {
   static async index(): Promise<ApiResponse<AccountIndexResponse>> {
     return apiClient.get('/accounts');
@@ -26,5 +50,20 @@ export class AccountService {
 
   static async show(id: number): Promise<ApiResponse<AccountShowResponse>> {
     return apiClient.get(`/accounts/${id}`);
+  }
+
+  static async update(
+    id: number,
+    request: Partial<AccountUpdateRequest>
+  ): Promise<AccountUpdateApiResponse> {
+    const res = await apiClient.put(`/accounts/${id}`, request);
+
+    if (!res.success && res.validationErrors) {
+      const errors = extractValidationErrors(res);
+      if (errors) {
+        return { errors: errors as AccountUpdateValidationError };
+      }
+    }
+    return res;
   }
 }
