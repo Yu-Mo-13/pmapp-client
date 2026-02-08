@@ -7,12 +7,15 @@ export interface Account {
   id: number;
   name: string;
   application_id: number;
-  application_name: string;
   notice_class: boolean;
 }
 
+export type AccountIndexRow = Account & {
+  application_name: string;
+};
+
 export type AccountIndexResponse = {
-  data: Account[];
+  data: AccountIndexRow[];
 };
 
 export type AccountShowResponse = Account & {
