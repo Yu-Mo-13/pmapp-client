@@ -43,6 +43,8 @@ export type AccountUpdateApiResponse =
       errors?: AccountUpdateValidationError;
     };
 
+export type AccountDeleteResponse = unknown;
+
 export class AccountService {
   static async index(): Promise<ApiResponse<AccountIndexResponse>> {
     return apiClient.get('/accounts');
@@ -65,5 +67,9 @@ export class AccountService {
       }
     }
     return res;
+  }
+
+  static async delete(id: number): Promise<ApiResponse<AccountDeleteResponse>> {
+    return apiClient.delete(`/accounts/${id}`);
   }
 }
