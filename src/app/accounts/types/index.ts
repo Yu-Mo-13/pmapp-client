@@ -1,7 +1,10 @@
-import { Account } from '@/api/services/account/accountService';
+import {
+  Account,
+  AccountIndexRow,
+} from '@/api/services/account/accountService';
 
 export interface AccountTableRowProps {
-  account: Partial<Account>;
+  account: Partial<AccountIndexRow>;
 }
 
 export interface AccountTableProps {
