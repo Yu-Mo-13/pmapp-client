@@ -10,8 +10,12 @@ export interface Account {
   notice_class: boolean;
 }
 
+export type AccountIndexRow = Account & {
+  application_name: string;
+};
+
 export type AccountIndexResponse = {
-  data: Account[];
+  data: AccountIndexRow[];
 };
 
 export type AccountShowResponse = Account & {
