@@ -222,6 +222,7 @@ class ApiClient {
   setAuthToken(token: string): void {
     if (typeof window !== 'undefined') {
       localStorage.setItem('auth_token', token);
+      window.dispatchEvent(new Event('auth-token-updated'));
     }
   }
 
