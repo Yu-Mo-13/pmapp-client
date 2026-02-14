@@ -12,6 +12,10 @@ export interface LoginResponse {
   access_token: string;
 }
 
+export interface LoginStatusResponse {
+  name: string;
+}
+
 export interface LoginValidationError {
   email?: string[];
   password?: string[];
@@ -37,5 +41,9 @@ export class AuthService {
     }
 
     return response as ApiResponse<LoginResponse>;
+  }
+
+  static async loginStatus(): Promise<ApiResponse<LoginStatusResponse>> {
+    return apiClient.get<LoginStatusResponse>('/login/status');
   }
 }
