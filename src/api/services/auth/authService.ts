@@ -46,4 +46,8 @@ export class AuthService {
   static async loginStatus(): Promise<ApiResponse<LoginStatusResponse>> {
     return apiClient.get<LoginStatusResponse>('/login/status');
   }
+
+  static async logout(): Promise<ApiResponse<void>> {
+    return apiClient.post<void>('/logout');
+  }
 }
