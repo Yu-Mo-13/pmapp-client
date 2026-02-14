@@ -1,19 +1,23 @@
 // components/Header.tsx
 'use client';
 import React, { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { AuthService } from '@/api/services/auth/authService';
 import { HeaderProps } from '@/types/header';
 
 const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
   const appName = process.env.APP_NAME || 'PMAPP';
+  const pathname = usePathname();
   const [userName, setUserName] = useState(props.userName ?? 'ゲスト');
 
   useEffect(() => {
     let ignore = false;
 
-    const fetchLoginStatus = async () => {
+    const refreshUserName = async () => {
       const response = await AuthService.loginStatus();
-      if (ignore) return;
+      if (ignore) {
+        return;
+      }
 
       if (response.success && response.data?.name) {
         setUserName(response.data.name);
@@ -23,11 +27,17 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
       setUserName('ゲスト');
     };
 
-    void fetchLoginStatus();
+    const handleAuthTokenUpdated = () => {
+      void refreshUserName();
+    };
+
+    void refreshUserName();
+    window.addEventListener('auth-token-updated', handleAuthTokenUpdated);
     return () => {
       ignore = true;
+      window.removeEventListener('auth-token-updated', handleAuthTokenUpdated);
     };
-  }, []);
+  }, [pathname]);
 
   return (
     <header
