@@ -30,7 +30,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <div className="min-h-screen bg-gray-100">
-          <Header userName="パスワード 太郎" />
+          <Header />
           <div className="flex">
             <Sidebar activeMenu={'アプリケーション一覧'} />
             {children}

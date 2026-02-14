@@ -10,6 +10,7 @@ export interface LoginFormState {
   success?: boolean;
   message?: string; // Optional: General message for non-field specific errors
   shouldRedirect?: boolean;
+  accessToken?: string;
 }
 
 export async function loginAction(
@@ -35,13 +36,12 @@ export async function loginAction(
       response.success &&
       response.data?.access_token
     ) {
-      // 実際にはトークンを保存する処理が必要 (セッション管理など)
-      // e.g. cookies().set('token', response.data.access_token);
       return {
         errors: {},
         success: true,
         message: 'Login successful.',
         shouldRedirect: true, // 成功時にリダイレクトフラグを立てる
+        accessToken: response.data.access_token,
       };
     }
 

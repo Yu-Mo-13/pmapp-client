@@ -2,6 +2,7 @@
 
 import React, { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { apiClient } from '@/api';
 import SubmitButton from '@/components/button/SubmitButton';
 import { ErrorMessage } from '@/components/form/ErrorMessage';
 import { loginAction } from './loginActions';
@@ -19,10 +20,11 @@ const LoginForm: React.FC = () => {
   const [state, formAction] = useActionState(loginAction, initialState);
 
   useEffect(() => {
-    if (state.shouldRedirect) {
+    if (state.shouldRedirect && state.accessToken) {
+      apiClient.setAuthToken(state.accessToken);
       router.push('/applications');
     }
-  }, [state.shouldRedirect, router]);
+  }, [state.shouldRedirect, state.accessToken, router]);
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 bg-[#f0f0f0]">
