@@ -56,13 +56,15 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
       <h1 className="text-xl font-bold">{appName}</h1>
       <div className="flex items-center gap-3">
         <span className="text-xl">{userName}</span>
-        <button
-          type="button"
-          onClick={handleLogout}
-          className="px-3 py-1 text-sm border border-white rounded hover:bg-white hover:text-[#3E3E3E] transition-colors"
-        >
-          ログアウト
-        </button>
+        {userName !== 'ゲスト' && (
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="px-3 py-1 text-sm border border-white rounded hover:bg-white hover:text-[#3E3E3E] transition-colors"
+          >
+            ログアウト
+          </button>
+        )}
       </div>
     </header>
   );
