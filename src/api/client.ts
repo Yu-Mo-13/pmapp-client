@@ -117,9 +117,10 @@ class ApiClient {
     }
   }
 
-  private clearAuthToken(): void {
+  clearAuthToken(): void {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('auth_token');
+      window.dispatchEvent(new Event('auth-token-updated'));
     }
   }
 
