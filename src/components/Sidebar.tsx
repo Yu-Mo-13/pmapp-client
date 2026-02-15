@@ -23,16 +23,18 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
       }
 
       const items = extractMenuItems(response.data);
-      if (items.length > 0) {
-        setMenuItems(items);
-      }
+      setMenuItems(items);
     };
 
     void loadMenus();
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [pathname]);
+
+  if (menuItems.length === 0) {
+    return null;
+  }
 
   return (
     <nav
