@@ -36,7 +36,7 @@ export default async function RootLayout({
         <div className="min-h-screen bg-gray-100">
           <Header userName={userName ?? 'ゲスト'} />
           <div className="flex">
-            <Sidebar activeMenu={'アプリケーション一覧'} />
+            <Sidebar />
             {children}
           </div>
         </div>
