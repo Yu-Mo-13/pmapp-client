@@ -68,6 +68,11 @@ class ApiClient {
     return error.response?.data as ErrorResponseData | undefined;
   }
 
+  /**
+   * 401 時に「認証付きリクエストだったか」を判定する。
+   * Axios の headers は実行環境により AxiosHeaders(getメソッドあり) と
+   * プレーンオブジェクトのどちらにもなり得るため、両方の形を吸収して確認する。
+   */
   private hasAuthorizationHeader(error: AxiosError): boolean {
     const requestHeaders = error.config?.headers as
       | (Record<string, unknown> & {
@@ -75,12 +80,14 @@ class ApiClient {
         })
       | undefined;
 
+    // ヘッダー名の大文字・小文字ゆれも考慮して Authorization を読む。
     const authorizationHeader =
       (typeof requestHeaders?.get === 'function'
         ? requestHeaders.get('Authorization') ??
           requestHeaders.get('authorization')
         : requestHeaders?.Authorization ?? requestHeaders?.authorization) ?? '';
 
+    // 空文字でなければ「認証ヘッダーあり」とみなす。
     return (
       typeof authorizationHeader === 'string' && authorizationHeader.length > 0
     );
