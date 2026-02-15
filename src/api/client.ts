@@ -60,75 +60,100 @@ class ApiClient {
     return null;
   }
 
-  private handleError(
-    error: AxiosError
-  ): ApiError & { validationErrors?: unknown } {
-    const status = error.response?.status || 500;
-    const responseData = error.response?.data as ErrorResponseData;
+  private getErrorStatus(error: AxiosError): number {
+    return error.response?.status || 500;
+  }
+
+  private getErrorResponseData(error: AxiosError): ErrorResponseData | undefined {
+    return error.response?.data as ErrorResponseData | undefined;
+  }
+
+  private hasAuthorizationHeader(error: AxiosError): boolean {
     const requestHeaders = error.config?.headers as
       | (Record<string, unknown> & {
           get?: (name: string) => unknown;
         })
       | undefined;
+
     const authorizationHeader =
       (typeof requestHeaders?.get === 'function'
         ? requestHeaders.get('Authorization') ??
           requestHeaders.get('authorization')
         : requestHeaders?.Authorization ?? requestHeaders?.authorization) ?? '';
-    const hasAuthorizationHeader =
-      typeof authorizationHeader === 'string' && authorizationHeader.length > 0;
+
+    return (
+      typeof authorizationHeader === 'string' && authorizationHeader.length > 0
+    );
+  }
+
+  private createApiError(
+    status: number,
+    message: string,
+    code: string,
+    validationErrors?: unknown
+  ): ApiError & { validationErrors?: unknown } {
+    return {
+      message,
+      status,
+      code,
+      ...(validationErrors ? { validationErrors } : {}),
+    };
+  }
+
+  private handleError(
+    error: AxiosError
+  ): ApiError & { validationErrors?: unknown } {
+    const status = this.getErrorStatus(error);
+    const responseData = this.getErrorResponseData(error);
 
     switch (status) {
       case 401:
         // 認証エラー - トークンをクリアしてログイン画面にリダイレクト
-        if (hasAuthorizationHeader) {
+        if (this.hasAuthorizationHeader(error)) {
           this.clearAuthToken();
           this.redirectToLogin();
         }
-        return {
-          message: '認証が必要です。再度ログインしてください。',
+        return this.createApiError(
           status,
-          code: 'UNAUTHORIZED',
-        };
+          '認証が必要です。再度ログインしてください。',
+          'UNAUTHORIZED'
+        );
 
       case 403:
-        return {
-          message: 'この操作を実行する権限がありません。',
+        return this.createApiError(
           status,
-          code: 'FORBIDDEN',
-        };
+          'この操作を実行する権限がありません。',
+          'FORBIDDEN'
+        );
 
       case 404:
-        return {
-          message: 'リクエストされたリソースが見つかりません。',
+        return this.createApiError(
           status,
-          code: 'NOT_FOUND',
-        };
+          'リクエストされたリソースが見つかりません。',
+          'NOT_FOUND'
+        );
 
       case 422:
-        // バリデーションエラー - レスポンスデータも含める
-        return {
-          message: responseData?.message || '入力データに問題があります。',
+        return this.createApiError(
           status,
-          code: 'VALIDATION_ERROR',
-          validationErrors: responseData, // バリデーションエラーの詳細を保持
-        };
+          responseData?.message || '入力データに問題があります。',
+          'VALIDATION_ERROR',
+          responseData
+        );
 
       case 500:
-        return {
-          message:
-            'サーバーエラーが発生しました。しばらく時間をおいてから再度お試しください。',
+        return this.createApiError(
           status,
-          code: 'INTERNAL_SERVER_ERROR',
-        };
+          'サーバーエラーが発生しました。しばらく時間をおいてから再度お試しください。',
+          'INTERNAL_SERVER_ERROR'
+        );
 
       default:
-        return {
-          message:
-            responseData?.message || error.message || 'エラーが発生しました。',
+        return this.createApiError(
           status,
-          code: 'UNKNOWN_ERROR',
-        };
+          responseData?.message || error.message || 'エラーが発生しました。',
+          'UNKNOWN_ERROR'
+        );
     }
   }
 
