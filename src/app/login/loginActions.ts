@@ -3,6 +3,7 @@
 import { cookies } from 'next/headers';
 import {
   AuthService,
+  extractUserNameFromToken,
   LoginValidationError,
 } from '@/api/services/auth/authService';
 
@@ -39,8 +40,14 @@ export async function loginAction(
         : undefined;
 
     if ('success' in response && response.success && accessToken) {
+      const userName = extractUserNameFromToken(accessToken) || email;
       const cookieStore = await cookies();
       cookieStore.set('auth_token', accessToken, {
+        path: '/',
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+      });
+      cookieStore.set('auth_user_name', userName, {
         path: '/',
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',

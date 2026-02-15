@@ -126,13 +126,14 @@ describe('ApiClient', () => {
   });
 
   describe('Error handling', () => {
-    it('401エラーを適切に処理する', async () => {
+    it('認証ヘッダー付きの401エラーを適切に処理する', async () => {
       const redirectToLoginSpy = jest
         .spyOn(
           apiClient as unknown as { redirectToLogin: () => void },
           'redirectToLogin'
         )
         .mockImplementation(() => {});
+      localStorageMock.getItem.mockReturnValue('test-token');
 
       mockAxios.onGet('http://localhost:3000/api/users').reply(401, {
         message: 'Unauthorized',
@@ -152,6 +153,27 @@ describe('ApiClient', () => {
       expect(localStorageMock.removeItem).toHaveBeenCalledWith('auth_token');
       // ログイン画面に遷移することを確認
       expect(redirectToLoginSpy).toHaveBeenCalled();
+    });
+
+    it('認証ヘッダーなしの401エラーではトークンをクリアしない', async () => {
+      const redirectToLoginSpy = jest
+        .spyOn(
+          apiClient as unknown as { redirectToLogin: () => void },
+          'redirectToLogin'
+        )
+        .mockImplementation(() => {});
+      localStorageMock.getItem.mockReturnValue(null);
+
+      mockAxios.onGet('http://localhost:3000/api/users').reply(401, {
+        message: 'Unauthorized',
+      });
+
+      const response = await apiClient.get('/users');
+
+      expect(response.success).toBe(false);
+      expect(response.error?.status).toBe(401);
+      expect(localStorageMock.removeItem).not.toHaveBeenCalled();
+      expect(redirectToLoginSpy).not.toHaveBeenCalled();
     });
 
     it('403エラーを適切に処理する', async () => {

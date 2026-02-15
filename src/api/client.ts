@@ -65,12 +65,26 @@ class ApiClient {
   ): ApiError & { validationErrors?: unknown } {
     const status = error.response?.status || 500;
     const responseData = error.response?.data as ErrorResponseData;
+    const requestHeaders = error.config?.headers as
+      | (Record<string, unknown> & {
+          get?: (name: string) => unknown;
+        })
+      | undefined;
+    const authorizationHeader =
+      (typeof requestHeaders?.get === 'function'
+        ? requestHeaders.get('Authorization') ??
+          requestHeaders.get('authorization')
+        : requestHeaders?.Authorization ?? requestHeaders?.authorization) ?? '';
+    const hasAuthorizationHeader =
+      typeof authorizationHeader === 'string' && authorizationHeader.length > 0;
 
     switch (status) {
       case 401:
         // 認証エラー - トークンをクリアしてログイン画面にリダイレクト
-        this.clearAuthToken();
-        this.redirectToLogin();
+        if (hasAuthorizationHeader) {
+          this.clearAuthToken();
+          this.redirectToLogin();
+        }
         return {
           message: '認証が必要です。再度ログインしてください。',
           status,
@@ -121,8 +135,11 @@ class ApiClient {
   clearAuthToken(): void {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_user_name');
       document.cookie =
         'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+      document.cookie =
+        'auth_user_name=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
       window.dispatchEvent(new Event('auth-token-updated'));
     }
   }

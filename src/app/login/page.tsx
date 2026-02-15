@@ -3,6 +3,11 @@
 import React, { useActionState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/api';
+import {
+  AuthService,
+  extractUserName,
+  extractUserNameFromToken,
+} from '@/api/services/auth/authService';
 import SubmitButton from '@/components/button/SubmitButton';
 import { ErrorMessage } from '@/components/form/ErrorMessage';
 import { loginAction } from './loginActions';
@@ -20,10 +25,29 @@ const LoginForm: React.FC = () => {
   const [state, formAction] = useActionState(loginAction, initialState);
 
   useEffect(() => {
-    if (state.shouldRedirect && state.accessToken) {
+    const handleLoginSuccess = async () => {
+      if (!state.shouldRedirect || !state.accessToken) {
+        return;
+      }
+
       apiClient.setAuthToken(state.accessToken);
+
+      const tokenUserName = extractUserNameFromToken(state.accessToken);
+      if (tokenUserName) {
+        localStorage.setItem('auth_user_name', tokenUserName);
+      }
+
+      const response = await AuthService.loginStatus();
+      const userName = response.success ? extractUserName(response.data) : null;
+      if (userName) {
+        localStorage.setItem('auth_user_name', userName);
+      }
+
+      window.dispatchEvent(new Event('auth-token-updated'));
       router.push('/applications');
-    }
+    };
+
+    void handleLoginSuccess();
   }, [state.shouldRedirect, state.accessToken, router]);
 
   return (
