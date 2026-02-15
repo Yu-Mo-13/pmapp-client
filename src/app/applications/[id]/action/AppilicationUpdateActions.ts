@@ -4,6 +4,7 @@ import {
   ApplicationService,
   ApplicationValidationError,
 } from '@/api/services/application/applicationService';
+import { getServerAuthConfig } from '@/lib/serverAuthConfig';
 
 export interface FormState {
   errors?: ApplicationValidationError;
@@ -15,6 +16,7 @@ export async function updateApplication(
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
+  void prevState;
   const id = Number(formData.get('id'));
   if (!id) {
     return {
@@ -36,7 +38,8 @@ export async function updateApplication(
   };
 
   try {
-    const response = await ApplicationService.update(id, application);
+    const authConfig = await getServerAuthConfig();
+    const response = await ApplicationService.update(id, application, authConfig);
 
     if ('errors' in response && response.errors) {
       return {

@@ -2,9 +2,11 @@ import React from 'react';
 import { Application } from '@/api/services/application/applicationService';
 import ApplicationList from '@/app/applications/_components/ApplicationList';
 import { ApplicationService } from '@/api/services/application/applicationService';
+import { getServerAuthConfig } from '@/lib/serverAuthConfig';
 
 const Page: React.FC = async () => {
-  const res = await ApplicationService.index();
+  const authConfig = await getServerAuthConfig();
+  const res = await ApplicationService.index(authConfig);
   const applications: Application[] = Array.isArray(res.data) ? res.data : [];
 
   return (

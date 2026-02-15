@@ -3,7 +3,11 @@
 import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { apiClient } from '@/api';
-import { AuthService } from '@/api/services/auth/authService';
+import {
+  AuthService,
+  extractUserName,
+  extractUserNameFromToken,
+} from '@/api/services/auth/authService';
 import { HeaderProps } from '@/types/header';
 
 const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
@@ -16,13 +20,40 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
     let ignore = false;
 
     const refreshUserName = async () => {
+      const token = localStorage.getItem('auth_token');
+      if (!token) {
+        localStorage.removeItem('auth_user_name');
+        setUserName('ゲスト');
+        return;
+      }
+
+      const cachedUserName = localStorage.getItem('auth_user_name');
+      if (cachedUserName) {
+        setUserName(cachedUserName);
+      }
+
+      const tokenUserName = extractUserNameFromToken(token);
+      if (tokenUserName) {
+        localStorage.setItem('auth_user_name', tokenUserName);
+        setUserName(tokenUserName);
+      }
+
       const response = await AuthService.loginStatus();
       if (ignore) {
         return;
       }
 
-      if (response.success && response.data?.name) {
-        setUserName(response.data.name);
+      if (response.success) {
+        const currentUserName = extractUserName(response.data);
+        if (currentUserName) {
+          localStorage.setItem('auth_user_name', currentUserName);
+          setUserName(currentUserName);
+          return;
+        }
+      }
+
+      if (cachedUserName) {
+        setUserName(cachedUserName);
         return;
       }
 

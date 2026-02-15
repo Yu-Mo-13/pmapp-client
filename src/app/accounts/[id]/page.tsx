@@ -2,6 +2,7 @@ import React from 'react';
 import Title from '@/components/Title';
 import { AccountService } from '@/api/services/account/accountService';
 import AccountEditForm from './_components/AccountEditForm';
+import { getServerAuthConfig } from '@/lib/serverAuthConfig';
 
 type AccountEditPageProps = {
   params: Promise<{
@@ -12,9 +13,10 @@ type AccountEditPageProps = {
 const AccountEditPage: React.FC<AccountEditPageProps> = async ({ params }) => {
   // paramsをawaitで取得
   const { id } = await params;
+  const authConfig = await getServerAuthConfig();
 
   // サーバーサイドでアカウント情報を取得
-  const res = await AccountService.show(Number(id));
+  const res = await AccountService.show(Number(id), authConfig);
   const account = res.data;
 
   return (

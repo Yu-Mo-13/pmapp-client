@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { cookies } from 'next/headers';
 import './globals.css';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
@@ -19,18 +20,21 @@ export const metadata: Metadata = {
   description: 'パスワード管理システム(WEB)',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const userName = cookieStore.get('auth_user_name')?.value;
+
   return (
     <html lang="ja">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <div className="min-h-screen bg-gray-100">
-          <Header />
+          <Header userName={userName ?? 'ゲスト'} />
           <div className="flex">
             <Sidebar activeMenu={'アプリケーション一覧'} />
             {children}
