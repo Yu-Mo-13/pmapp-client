@@ -70,6 +70,7 @@ class ApiClient {
       case 401:
         // 認証エラー - トークンをクリアしてログイン画面にリダイレクト
         this.clearAuthToken();
+        this.redirectToLogin();
         return {
           message: '認証が必要です。再度ログインしてください。',
           status,
@@ -121,6 +122,16 @@ class ApiClient {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('auth_token');
       window.dispatchEvent(new Event('auth-token-updated'));
+    }
+  }
+
+  private redirectToLogin(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    if (window.location.pathname !== '/login') {
+      window.location.assign('/login');
     }
   }
 
