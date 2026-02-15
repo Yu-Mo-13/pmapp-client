@@ -1,3 +1,8 @@
 export interface SidebarProps {
-  activeMenu?: string;
+  className?: string;
+}
+
+export interface SidebarMenuItem {
+  name: string;
+  path: string;
 }
