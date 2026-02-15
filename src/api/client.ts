@@ -121,6 +121,8 @@ class ApiClient {
   clearAuthToken(): void {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('auth_token');
+      document.cookie =
+        'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
       window.dispatchEvent(new Event('auth-token-updated'));
     }
   }
@@ -234,6 +236,7 @@ class ApiClient {
   setAuthToken(token: string): void {
     if (typeof window !== 'undefined') {
       localStorage.setItem('auth_token', token);
+      document.cookie = `auth_token=${encodeURIComponent(token)}; Path=/; SameSite=Lax`;
       window.dispatchEvent(new Event('auth-token-updated'));
     }
   }

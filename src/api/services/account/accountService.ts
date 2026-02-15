@@ -1,5 +1,5 @@
 import apiClient from '../../client';
-import { ApiResponse } from '../../types';
+import { ApiResponse, RequestConfig } from '../../types';
 import { ApplicationShowResponse } from '../application/applicationService';
 import { extractValidationErrors } from '../../utils/validationErrorTransformer';
 
@@ -49,19 +49,25 @@ export type AccountUpdateApiResponse =
 export type AccountDeleteResponse = unknown;
 
 export class AccountService {
-  static async index(): Promise<ApiResponse<AccountIndexResponse>> {
-    return apiClient.get('/accounts');
+  static async index(
+    config?: RequestConfig
+  ): Promise<ApiResponse<AccountIndexResponse>> {
+    return apiClient.get('/accounts', config);
   }
 
-  static async show(id: number): Promise<ApiResponse<AccountShowResponse>> {
-    return apiClient.get(`/accounts/${id}`);
+  static async show(
+    id: number,
+    config?: RequestConfig
+  ): Promise<ApiResponse<AccountShowResponse>> {
+    return apiClient.get(`/accounts/${id}`, config);
   }
 
   static async update(
     id: number,
-    request: Partial<AccountUpdateRequest>
+    request: Partial<AccountUpdateRequest>,
+    config?: RequestConfig
   ): Promise<AccountUpdateApiResponse> {
-    const res = await apiClient.put(`/accounts/${id}`, request);
+    const res = await apiClient.put(`/accounts/${id}`, request, config);
 
     if (!res.success && res.validationErrors) {
       const errors = extractValidationErrors(res);
@@ -72,7 +78,10 @@ export class AccountService {
     return res;
   }
 
-  static async delete(id: number): Promise<ApiResponse<AccountDeleteResponse>> {
-    return apiClient.delete(`/accounts/${id}`);
+  static async delete(
+    id: number,
+    config?: RequestConfig
+  ): Promise<ApiResponse<AccountDeleteResponse>> {
+    return apiClient.delete(`/accounts/${id}`, config);
   }
 }

@@ -4,6 +4,7 @@ import {
   AccountUpdateValidationError,
   AccountService,
 } from '@/api/services/account/accountService';
+import { getServerAuthConfig } from '@/lib/serverAuthConfig';
 
 export interface FormState {
   errors?: AccountUpdateValidationError;
@@ -15,6 +16,7 @@ export async function updateAccount(
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
+  void prevState;
   const id = Number(formData.get('id'));
   if (!id) {
     return {
@@ -33,7 +35,8 @@ export async function updateAccount(
   };
 
   try {
-    const response = await AccountService.update(id, account);
+    const authConfig = await getServerAuthConfig();
+    const response = await AccountService.update(id, account, authConfig);
 
     if ('errors' in response && response.errors) {
       return {

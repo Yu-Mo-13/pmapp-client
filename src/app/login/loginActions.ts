@@ -1,5 +1,6 @@
 'use server';
 
+import { cookies } from 'next/headers';
 import {
   AuthService,
   LoginValidationError,
@@ -17,6 +18,7 @@ export async function loginAction(
   prevState: LoginFormState,
   formData: FormData
 ): Promise<LoginFormState> {
+  void prevState;
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
 
@@ -31,17 +33,25 @@ export async function loginAction(
       };
     }
 
-    if (
-      'success' in response &&
-      response.success &&
-      response.data?.access_token
-    ) {
+    const accessToken =
+      'success' in response && response.success
+        ? response.data?.access_token || response.data?.token
+        : undefined;
+
+    if ('success' in response && response.success && accessToken) {
+      const cookieStore = await cookies();
+      cookieStore.set('auth_token', accessToken, {
+        path: '/',
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+      });
+
       return {
         errors: {},
         success: true,
         message: 'Login successful.',
         shouldRedirect: true, // 成功時にリダイレクトフラグを立てる
-        accessToken: response.data.access_token,
+        accessToken,
       };
     }
 
