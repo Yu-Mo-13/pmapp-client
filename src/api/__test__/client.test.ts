@@ -127,6 +127,13 @@ describe('ApiClient', () => {
 
   describe('Error handling', () => {
     it('401エラーを適切に処理する', async () => {
+      const redirectToLoginSpy = jest
+        .spyOn(
+          apiClient as unknown as { redirectToLogin: () => void },
+          'redirectToLogin'
+        )
+        .mockImplementation(() => {});
+
       mockAxios.onGet('http://localhost:3000/api/users').reply(401, {
         message: 'Unauthorized',
       });
@@ -143,6 +150,8 @@ describe('ApiClient', () => {
 
       // トークンがクリアされることを確認
       expect(localStorageMock.removeItem).toHaveBeenCalledWith('auth_token');
+      // ログイン画面に遷移することを確認
+      expect(redirectToLoginSpy).toHaveBeenCalled();
     });
 
     it('403エラーを適切に処理する', async () => {
