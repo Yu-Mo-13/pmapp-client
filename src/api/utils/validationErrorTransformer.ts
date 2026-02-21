@@ -5,7 +5,12 @@
 
 export interface BackendValidationError {
   message: string;
-  errors: Record<string, string[]>;
+  errors: Record<string, string[]> | ValidationErrorItem[];
+}
+
+export interface ValidationErrorItem {
+  field?: string;
+  message: string;
 }
 
 export interface FrontendValidationError {
@@ -22,26 +27,37 @@ export function transformValidationErrors(
   backendErrors: BackendValidationError
 ): FrontendValidationError {
   const transformedErrors: FrontendValidationError = {};
+  const setError = (key: string, messages: string[]) => {
+    const keyParts = key.split('.');
+    if (keyParts.length >= 2) {
+      const [parentKey, fieldKey] = keyParts;
+      if (!transformedErrors[parentKey]) {
+        transformedErrors[parentKey] = {};
+      }
+      const parent = transformedErrors[parentKey] as Record<string, string[]>;
+      parent[fieldKey] = [...(parent[fieldKey] || []), ...messages];
+      return;
+    }
+    transformedErrors[key] = [
+      ...(((transformedErrors[key] as string[]) || []) as string[]),
+      ...messages,
+    ];
+  };
 
   if (backendErrors.errors) {
-    Object.keys(backendErrors.errors).forEach((key) => {
-      // ドット記法のキーを階層構造に変換
-      const keyParts = key.split('.');
-      if (keyParts.length >= 2) {
-        const [parentKey, fieldKey] = keyParts;
-
-        // 親オブジェクトが存在しない場合は作成
-        if (!transformedErrors[parentKey]) {
-          transformedErrors[parentKey] = {};
+    if (Array.isArray(backendErrors.errors)) {
+      backendErrors.errors.forEach(({ field, message }) => {
+        if (!message) {
+          return;
         }
+        setError(field || 'base', [message]);
+      });
+      return transformedErrors;
+    }
 
-        // フィールドエラーを設定
-        (transformedErrors[parentKey] as Record<string, string[]>)[fieldKey] =
-          backendErrors.errors[key];
-      } else {
-        // ドット記法でない場合はそのまま設定
-        transformedErrors[key] = backendErrors.errors[key];
-      }
+    const recordErrors = backendErrors.errors as Record<string, string[]>;
+    Object.keys(recordErrors).forEach((key) => {
+      setError(key, recordErrors[key]);
     });
   }
 
