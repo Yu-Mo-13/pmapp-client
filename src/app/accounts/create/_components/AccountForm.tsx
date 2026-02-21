@@ -8,11 +8,11 @@ import SubmitButton from '@/components/button/SubmitButton';
 import CancelButton from '@/components/button/CancelButton';
 import ToggleButton from '@/components/ToggleButton';
 import ArrowDown from '@/assets/images/arrow/arrowDown.svg';
-import { Application } from '@/api/services/application/applicationService';
+import { AccountApplicationOption } from '@/api/services/account/accountService';
 import { createAccount, FormState } from '../action/AccountCreateActions';
 
 interface AccountFormProps {
-  applications: Application[];
+  applications: AccountApplicationOption[];
 }
 
 const AccountForm: React.FC<AccountFormProps> = ({ applications }) => {

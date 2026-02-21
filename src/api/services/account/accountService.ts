@@ -18,6 +18,15 @@ export type AccountIndexResponse = {
   data: AccountIndexRow[];
 };
 
+export interface AccountApplicationOption {
+  id: number;
+  name: string;
+}
+
+export type AccountApplicationsResponse = {
+  data: AccountApplicationOption[];
+};
+
 export type AccountShowResponse = Account & {
   application: ApplicationShowResponse;
 };
@@ -86,6 +95,12 @@ export class AccountService {
     config?: RequestConfig
   ): Promise<ApiResponse<AccountShowResponse>> {
     return apiClient.get(`/accounts/${id}`, config);
+  }
+
+  static async applications(
+    config?: RequestConfig
+  ): Promise<ApiResponse<AccountApplicationsResponse>> {
+    return apiClient.get('/accounts/applications', config);
   }
 
   static async create(

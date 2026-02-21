@@ -1,13 +1,18 @@
 import React from 'react';
 import Title from '@/components/Title';
 import AccountForm from './_components/AccountForm';
-import { Application, ApplicationService } from '@/api/services/application/applicationService';
+import {
+  AccountApplicationOption,
+  AccountService,
+} from '@/api/services/account/accountService';
 import { getServerAuthConfig } from '@/lib/serverAuthConfig';
 
 const AccountCreatePage = async () => {
   const authConfig = await getServerAuthConfig();
-  const res = await ApplicationService.index(authConfig);
-  const applications: Application[] = Array.isArray(res.data) ? res.data : [];
+  const res = await AccountService.applications(authConfig);
+  const applications: AccountApplicationOption[] = Array.isArray(res.data)
+    ? res.data
+    : [];
 
   return (
     <main className="flex-1 p-6">
