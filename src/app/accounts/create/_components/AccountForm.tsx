@@ -3,12 +3,19 @@
 import React, { useEffect } from 'react';
 import { useActionState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import SubmitButton from '@/components/button/SubmitButton';
 import CancelButton from '@/components/button/CancelButton';
 import ToggleButton from '@/components/ToggleButton';
+import ArrowDown from '@/assets/images/arrow/arrowDown.svg';
+import { Application } from '@/api/services/application/applicationService';
 import { createAccount, FormState } from '../action/AccountCreateActions';
 
-const AccountForm: React.FC = () => {
+interface AccountFormProps {
+  applications: Application[];
+}
+
+const AccountForm: React.FC<AccountFormProps> = ({ applications }) => {
   const router = useRouter();
   const initialState: FormState = {
     errors: undefined,
@@ -39,6 +46,37 @@ const AccountForm: React.FC = () => {
         {state.errors?.account?.name && (
           <div className="text-red-500 text-sm mt-1 ml-4">
             {state.errors.account.name.join(', ')}
+          </div>
+        )}
+      </div>
+
+      {/* アプリケーション */}
+      <div>
+        <label className="block text-gray-700 font-medium mb-3">
+          アプリケーション
+        </label>
+        <div className="relative w-[97%] m-4 py-3">
+          <select
+            name="application_id"
+            defaultValue=""
+            className="w-full text-black px-4 py-3 pr-12 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent appearance-none"
+          >
+            <option value="" disabled>
+              選択してください
+            </option>
+            {applications.map((application) => (
+              <option key={application.id} value={application.id}>
+                {application.name}
+              </option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center">
+            <Image src={ArrowDown} alt="選択" width={16} height={16} />
+          </div>
+        </div>
+        {state.errors?.account?.application_id && (
+          <div className="text-red-500 text-sm mt-1 ml-4">
+            {state.errors.account.application_id.join(', ')}
           </div>
         )}
       </div>

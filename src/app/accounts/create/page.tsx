@@ -1,8 +1,14 @@
 import React from 'react';
 import Title from '@/components/Title';
 import AccountForm from './_components/AccountForm';
+import { Application, ApplicationService } from '@/api/services/application/applicationService';
+import { getServerAuthConfig } from '@/lib/serverAuthConfig';
 
-const AccountCreatePage: React.FC = () => {
+const AccountCreatePage = async () => {
+  const authConfig = await getServerAuthConfig();
+  const res = await ApplicationService.index(authConfig);
+  const applications: Application[] = Array.isArray(res.data) ? res.data : [];
+
   return (
     <main className="flex-1 p-6">
       {/* ヘッダー部分 */}
@@ -11,7 +17,7 @@ const AccountCreatePage: React.FC = () => {
       </div>
 
       {/* フォーム部分 */}
-      <AccountForm />
+      <AccountForm applications={applications} />
     </main>
   );
 };
