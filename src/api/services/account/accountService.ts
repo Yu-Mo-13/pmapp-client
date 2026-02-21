@@ -104,9 +104,10 @@ export class AccountService {
   }
 
   static async create(
-    request: Partial<AccountCreateRequest>
+    request: Partial<AccountCreateRequest>,
+    config?: RequestConfig
   ): Promise<AccountCreateApiResponse> {
-    const res = await apiClient.post('/accounts', request);
+    const res = await apiClient.post('/accounts', request, config);
 
     if (!res.success && res.validationErrors) {
       const errors = extractValidationErrors(res);

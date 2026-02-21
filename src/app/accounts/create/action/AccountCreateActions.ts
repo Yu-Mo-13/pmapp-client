@@ -4,6 +4,7 @@ import {
   AccountService,
   AccountCreateValidationError,
 } from '@/api/services/account/accountService';
+import { getServerAuthConfig } from '@/lib/serverAuthConfig';
 
 export interface FormState {
   errors?: AccountCreateValidationError;
@@ -15,6 +16,7 @@ export async function createAccount(
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
+  void prevState;
   const TOGGLE_ON = '1';
   const account = {
     account: {
@@ -25,11 +27,24 @@ export async function createAccount(
   };
 
   try {
-    const response = await AccountService.create(account);
+    const authConfig = await getServerAuthConfig();
+    const response = await AccountService.create(account, authConfig);
 
     if ('errors' in response && response.errors) {
       return {
         errors: response.errors,
+        success: false,
+        shouldRedirect: false,
+      };
+    }
+
+    if ('success' in response && !response.success) {
+      return {
+        errors: {
+          account: {
+            name: [response.error?.message || '登録に失敗しました。'],
+          },
+        },
         success: false,
         shouldRedirect: false,
       };
