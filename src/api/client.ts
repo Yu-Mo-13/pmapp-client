@@ -60,66 +60,129 @@ class ApiClient {
     return null;
   }
 
+  private getErrorStatus(error: AxiosError): number {
+    return error.response?.status || 500;
+  }
+
+  private getErrorResponseData(error: AxiosError): ErrorResponseData | undefined {
+    return error.response?.data as ErrorResponseData | undefined;
+  }
+
+  /**
+   * 401 時に「認証付きリクエストだったか」を判定する。
+   * Axios の headers は実行環境により AxiosHeaders(getメソッドあり) と
+   * プレーンオブジェクトのどちらにもなり得るため、両方の形を吸収して確認する。
+   */
+  private hasAuthorizationHeader(error: AxiosError): boolean {
+    const requestHeaders = error.config?.headers as
+      | (Record<string, unknown> & {
+          get?: (name: string) => unknown;
+        })
+      | undefined;
+
+    // ヘッダー名の大文字・小文字ゆれも考慮して Authorization を読む。
+    const authorizationHeader =
+      (typeof requestHeaders?.get === 'function'
+        ? requestHeaders.get('Authorization') ??
+          requestHeaders.get('authorization')
+        : requestHeaders?.Authorization ?? requestHeaders?.authorization) ?? '';
+
+    // 空文字でなければ「認証ヘッダーあり」とみなす。
+    return (
+      typeof authorizationHeader === 'string' && authorizationHeader.length > 0
+    );
+  }
+
+  private createApiError(
+    status: number,
+    message: string,
+    code: string,
+    validationErrors?: unknown
+  ): ApiError & { validationErrors?: unknown } {
+    return {
+      message,
+      status,
+      code,
+      ...(validationErrors ? { validationErrors } : {}),
+    };
+  }
+
   private handleError(
     error: AxiosError
   ): ApiError & { validationErrors?: unknown } {
-    const status = error.response?.status || 500;
-    const responseData = error.response?.data as ErrorResponseData;
+    const status = this.getErrorStatus(error);
+    const responseData = this.getErrorResponseData(error);
 
     switch (status) {
       case 401:
         // 認証エラー - トークンをクリアしてログイン画面にリダイレクト
-        this.clearAuthToken();
-        return {
-          message: '認証が必要です。再度ログインしてください。',
+        if (this.hasAuthorizationHeader(error)) {
+          this.clearAuthToken();
+          this.redirectToLogin();
+        }
+        return this.createApiError(
           status,
-          code: 'UNAUTHORIZED',
-        };
+          '認証が必要です。再度ログインしてください。',
+          'UNAUTHORIZED'
+        );
 
       case 403:
-        return {
-          message: 'この操作を実行する権限がありません。',
+        return this.createApiError(
           status,
-          code: 'FORBIDDEN',
-        };
+          'この操作を実行する権限がありません。',
+          'FORBIDDEN'
+        );
 
       case 404:
-        return {
-          message: 'リクエストされたリソースが見つかりません。',
+        return this.createApiError(
           status,
-          code: 'NOT_FOUND',
-        };
+          'リクエストされたリソースが見つかりません。',
+          'NOT_FOUND'
+        );
 
       case 422:
-        // バリデーションエラー - レスポンスデータも含める
-        return {
-          message: responseData?.message || '入力データに問題があります。',
+        return this.createApiError(
           status,
-          code: 'VALIDATION_ERROR',
-          validationErrors: responseData, // バリデーションエラーの詳細を保持
-        };
+          responseData?.message || '入力データに問題があります。',
+          'VALIDATION_ERROR',
+          responseData
+        );
 
       case 500:
-        return {
-          message:
-            'サーバーエラーが発生しました。しばらく時間をおいてから再度お試しください。',
+        return this.createApiError(
           status,
-          code: 'INTERNAL_SERVER_ERROR',
-        };
+          'サーバーエラーが発生しました。しばらく時間をおいてから再度お試しください。',
+          'INTERNAL_SERVER_ERROR'
+        );
 
       default:
-        return {
-          message:
-            responseData?.message || error.message || 'エラーが発生しました。',
+        return this.createApiError(
           status,
-          code: 'UNKNOWN_ERROR',
-        };
+          responseData?.message || error.message || 'エラーが発生しました。',
+          'UNKNOWN_ERROR'
+        );
     }
   }
 
-  private clearAuthToken(): void {
+  clearAuthToken(): void {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('auth_token');
+      localStorage.removeItem('auth_user_name');
+      document.cookie =
+        'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+      document.cookie =
+        'auth_user_name=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
+      window.dispatchEvent(new Event('auth-token-updated'));
+    }
+  }
+
+  private redirectToLogin(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    if (window.location.pathname !== '/login') {
+      window.location.assign('/login');
     }
   }
 
@@ -222,6 +285,8 @@ class ApiClient {
   setAuthToken(token: string): void {
     if (typeof window !== 'undefined') {
       localStorage.setItem('auth_token', token);
+      document.cookie = `auth_token=${encodeURIComponent(token)}; Path=/; SameSite=Lax`;
+      window.dispatchEvent(new Event('auth-token-updated'));
     }
   }
 

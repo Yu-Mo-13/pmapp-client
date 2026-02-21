@@ -2,6 +2,7 @@
 export { UserService } from './user/userService';
 export { ProductService } from './product/productService';
 export { ApplicationService } from './application/applicationService';
+export { MenuService, extractMenuItems } from './menu/menuService';
 
 // サービス関連の型定義のエクスポート
 export type {
@@ -27,6 +28,8 @@ export type {
   ApplicationValidationError,
   ApplicationCreateApiResponse,
 } from './application/applicationService';
+
+export type { MenuIndexResponse } from './menu/menuService';
 
 // 将来のサービス追加例：
 // export { OrderService } from './orderService';

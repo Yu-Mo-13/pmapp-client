@@ -1,40 +1,50 @@
 'use server';
 
 import {
-  ApplicationService,
-  ApplicationValidationError,
-} from '@/api/services/application/applicationService';
+  AccountService,
+  AccountCreateValidationError,
+} from '@/api/services/account/accountService';
 import { getServerAuthConfig } from '@/lib/serverAuthConfig';
 
 export interface FormState {
-  errors?: ApplicationValidationError;
+  errors?: AccountCreateValidationError;
   success?: boolean;
   shouldRedirect?: boolean;
 }
 
-export async function createApplication(
+export async function createAccount(
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
   void prevState;
   const TOGGLE_ON = '1';
-  const application = {
-    application: {
+  const account = {
+    account: {
       name: formData.get('name') as string,
-      account_class: formData.get('account_class') === TOGGLE_ON,
+      application_id: parseInt(formData.get('application_id') as string),
       notice_class: formData.get('notice_class') === TOGGLE_ON,
-      mark_class: formData.get('mark_class') === TOGGLE_ON,
-      pre_password_size: parseInt(formData.get('pre_password_size') as string),
     },
   };
 
   try {
     const authConfig = await getServerAuthConfig();
-    const response = await ApplicationService.create(application, authConfig);
+    const response = await AccountService.create(account, authConfig);
 
     if ('errors' in response && response.errors) {
       return {
         errors: response.errors,
+        success: false,
+        shouldRedirect: false,
+      };
+    }
+
+    if ('success' in response && !response.success) {
+      return {
+        errors: {
+          account: {
+            name: [response.error?.message || '登録に失敗しました。'],
+          },
+        },
         success: false,
         shouldRedirect: false,
       };
@@ -46,10 +56,10 @@ export async function createApplication(
       shouldRedirect: true,
     };
   } catch (error) {
-    console.error('Application creation failed:', error);
+    console.error('Account creation failed:', error);
     return {
       errors: {
-        application: {
+        account: {
           name: ['サーバーエラーが発生しました。再度お試しください。'],
         },
       },

@@ -2,6 +2,7 @@ import React from 'react';
 import Title from '@/components/Title';
 import { ApplicationService } from '@/api';
 import ApplicationEditForm from './_components/ApplicationEditForm';
+import { getServerAuthConfig } from '@/lib/serverAuthConfig';
 
 type ApplicationEditPageProps = {
   params: Promise<{
@@ -14,9 +15,10 @@ const ApplicationEditPage: React.FC<ApplicationEditPageProps> = async ({
 }) => {
   // paramsをawaitで取得
   const { id } = await params;
+  const authConfig = await getServerAuthConfig();
 
   // サーバーサイドでアプリケーション情報を取得
-  const res = await ApplicationService.show(Number(id));
+  const res = await ApplicationService.show(Number(id), authConfig);
   const application = res.data;
 
   return (

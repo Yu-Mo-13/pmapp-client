@@ -1,5 +1,5 @@
 import apiClient from '../../client';
-import { ApiResponse } from '../../types';
+import { ApiResponse, RequestConfig } from '../../types';
 import { extractValidationErrors } from '../../utils/validationErrorTransformer';
 
 export interface Application {
@@ -68,18 +68,24 @@ export type ApplicationUpdateApiResponse =
       errors?: ApplicationValidationError;
     };
 export class ApplicationService {
-  static async index(): Promise<ApiResponse<ApplicationIndexResponse>> {
-    return apiClient.get('/applications');
+  static async index(
+    config?: RequestConfig
+  ): Promise<ApiResponse<ApplicationIndexResponse>> {
+    return apiClient.get('/applications', config);
   }
 
-  static async show(id: number): Promise<ApiResponse<ApplicationShowResponse>> {
-    return apiClient.get(`/applications/${id}`);
+  static async show(
+    id: number,
+    config?: RequestConfig
+  ): Promise<ApiResponse<ApplicationShowResponse>> {
+    return apiClient.get(`/applications/${id}`, config);
   }
 
   static async create(
-    request: ApplicationCreateRequest
+    request: ApplicationCreateRequest,
+    config?: RequestConfig
   ): Promise<ApplicationCreateApiResponse> {
-    const response = await apiClient.post('/applications', request);
+    const response = await apiClient.post('/applications', request, config);
 
     // バリデーションエラーがある場合は変換して返す
     if (!response.success && response.validationErrors) {
@@ -94,9 +100,10 @@ export class ApplicationService {
 
   static async update(
     id: number,
-    request: Partial<ApplicationUpdateRequest>
+    request: Partial<ApplicationUpdateRequest>,
+    config?: RequestConfig
   ): Promise<ApplicationUpdateApiResponse> {
-    const response = await apiClient.put(`/applications/${id}`, request);
+    const response = await apiClient.put(`/applications/${id}`, request, config);
 
     // バリデーションエラーがある場合は変換して返す
     if (!response.success && response.validationErrors) {
@@ -110,8 +117,9 @@ export class ApplicationService {
   }
 
   static async delete(
-    id: number
+    id: number,
+    config?: RequestConfig
   ): Promise<ApiResponse<ApplicationDeleteResponse>> {
-    return apiClient.delete(`/applications/${id}`);
+    return apiClient.delete(`/applications/${id}`, config);
   }
 }
