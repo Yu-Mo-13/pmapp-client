@@ -2,8 +2,11 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import CancelButton from '@/components/button/CancelButton';
+import SubmitButton from '@/components/button/SubmitButton';
 import { UnregistedPasswordShowResponse } from '@/api/services/unregistedPassword/unregistedPasswordService';
+import { PasswordService } from '@/api/services/password/passwordService';
 import { formatDateTime } from '../../_components/unregistedPasswordFormat';
 import ToggleOff from '@/assets/images/toggle-password/invisible.svg';
 import ToggleOn from '@/assets/images/toggle-password/visible.svg';
@@ -15,9 +18,37 @@ type UnregistedPasswordDetailViewProps = {
 const UnregistedPasswordDetailView: React.FC<
   UnregistedPasswordDetailViewProps
 > = ({ item }) => {
+  const router = useRouter();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const passwordForDisplay = item.password ?? '-';
   const canTogglePassword = passwordForDisplay !== '-';
+  const canRegister =
+    typeof item.application_id === 'number' &&
+    typeof item.account_id === 'number' &&
+    passwordForDisplay !== '-';
+
+  const handleRegister = async () => {
+    if (!canRegister || isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const response = await PasswordService.create({
+      password: {
+        password: passwordForDisplay,
+        application_id: item.application_id!,
+        account_id: item.account_id!,
+      },
+    });
+
+    if ('success' in response && response.success) {
+      router.push('/unregisted-passwords');
+      return;
+    }
+    setIsSubmitting(false);
+  };
 
   return (
     <>
@@ -81,14 +112,7 @@ const UnregistedPasswordDetailView: React.FC<
 
       <div className="flex justify-center mt-14 gap-32">
         <CancelButton to="/unregisted-passwords" />
-        <button
-          type="button"
-          disabled
-          className="text-white w-36 px-6 py-3 rounded bg-[#3CB371] text-[18px] font-medium opacity-60 cursor-not-allowed"
-          title="未登録パスワード管理では登録APIが未実装のため操作できません。"
-        >
-          登録
-        </button>
+        <SubmitButton text="登録" onClick={handleRegister} />
       </div>
     </>
   );

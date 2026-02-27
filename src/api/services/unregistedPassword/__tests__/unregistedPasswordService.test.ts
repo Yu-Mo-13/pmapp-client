@@ -65,8 +65,8 @@ describe('extractUnregistedPasswordShow', () => {
         uuid: 'abc-show',
         password: 'secret',
         created_at: '2026-02-27T14:00:00+09:00',
-        application: { name: 'Notion' },
-        account: { name: 'admin' },
+        application: { id: 10, name: 'Notion' },
+        account: { id: 100, name: 'admin' },
       },
     });
 
@@ -74,6 +74,8 @@ describe('extractUnregistedPasswordShow', () => {
       uuid: 'abc-show',
       password: 'secret',
       decrypted_password: undefined,
+      application_id: 10,
+      account_id: 100,
       created_at: '2026-02-27T14:00:00+09:00',
       application_name: 'Notion',
       account_name: 'admin',

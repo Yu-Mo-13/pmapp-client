@@ -17,6 +17,8 @@ export interface UnregistedPasswordShowResponse {
   uuid: string;
   password?: string;
   decrypted_password?: string;
+  application_id?: number;
+  account_id?: number;
   created_at: string;
   application_name: string;
   account_name: string;
@@ -27,6 +29,8 @@ type UnregistedPasswordRaw = {
   created_at?: string;
   password?: string;
   decrypted_password?: string;
+  application_id?: number;
+  account_id?: number;
   application?: UnregistedPasswordRelation;
   account?: UnregistedPasswordRelation;
   application_name?: string;
@@ -54,6 +58,9 @@ const isObject = (value: unknown): value is Record<string, unknown> =>
 
 const pickString = (value: unknown): string | undefined =>
   typeof value === 'string' && value.length > 0 ? value : undefined;
+
+const pickNumber = (value: unknown): number | undefined =>
+  typeof value === 'number' && Number.isFinite(value) ? value : undefined;
 
 const normalizeListItem = (
   item: UnregistedPasswordRaw
@@ -119,6 +126,9 @@ export const extractUnregistedPasswordShow = (
     uuid,
     password: pickString(raw.password),
     decrypted_password: pickString(raw.decrypted_password),
+    application_id:
+      pickNumber(applicationObj?.id) ?? pickNumber(raw.application_id),
+    account_id: pickNumber(accountObj?.id) ?? pickNumber(raw.account_id),
     created_at: createdAt,
     application_name:
       pickString(applicationObj?.name) ?? pickString(raw.application_name) ?? '-',
