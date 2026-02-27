@@ -40,14 +40,14 @@ const UnregistedPasswordDetailView: React.FC<
           <div className="flex justify-between items-center mb-3">
             <span className="block text-gray-700 font-medium">パスワード</span>
           </div>
-          <div className="relative">
+          <div className="relative w-[97%] m-4">
             <input
               type={
                 canTogglePassword && !isPasswordVisible ? 'password' : 'text'
               }
               value={passwordForDisplay}
               readOnly
-              className="w-[97%] m-4 text-black px-4 py-3 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+              className="w-full text-black px-4 py-3 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
             />
             {canTogglePassword && (
               <button
@@ -58,6 +58,7 @@ const UnregistedPasswordDetailView: React.FC<
                     ? 'パスワードを非表示にする'
                     : 'パスワードを表示する'
                 }
+                className="absolute right-3 top-1/2 -translate-y-1/2"
               >
                 <Image
                   src={isPasswordVisible ? ToggleOn : ToggleOff}
