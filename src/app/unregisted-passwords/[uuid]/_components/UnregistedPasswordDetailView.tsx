@@ -5,8 +5,8 @@ import Image from 'next/image';
 import CancelButton from '@/components/button/CancelButton';
 import { UnregistedPasswordShowResponse } from '@/api/services/unregistedPassword/unregistedPasswordService';
 import { formatDateTime } from '../../_components/unregistedPasswordFormat';
-import ToggleOff from '@/assets/images/toggle/toggleOff.svg';
-import ToggleOn from '@/assets/images/toggle/toggleOn.svg';
+import ToggleOff from '@/assets/images/toggle-password/invisible.svg';
+import ToggleOn from '@/assets/images/toggle-password/visible.svg';
 
 type UnregistedPasswordDetailViewProps = {
   item: UnregistedPasswordShowResponse;
