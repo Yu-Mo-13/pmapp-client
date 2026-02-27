@@ -1,3 +1,9 @@
 [mcp_servers.github]
 url = "https://api.githubcopilot.com/mcp"
 env_http_headers = { Authorization = "GITHUB_PAT_BEARER" }
+
+[features]
+rmcp_client = true
+
+[mcp_servers.figma]
+url = "https://mcp.figma.com/mcp"
