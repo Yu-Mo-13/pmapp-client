@@ -26,10 +26,6 @@ const DeleteAllUnregistedPasswordsButton: React.FC<
     try {
       const response = await UnregistedPasswordService.deleteAll();
       if (response.success) {
-        alert(
-          response.data?.message ??
-            '未登録パスワードをすべて削除しました。'
-        );
         setIsOpen(false);
         router.refresh();
         return;
