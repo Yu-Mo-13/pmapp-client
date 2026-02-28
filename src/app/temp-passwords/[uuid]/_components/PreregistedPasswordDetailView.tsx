@@ -5,9 +5,9 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import CancelButton from '@/components/button/CancelButton';
 import SubmitButton from '@/components/button/SubmitButton';
-import { ErrorMessage } from '@/components/form/ErrorMessage';
 import { PasswordService } from '@/api/services/password/passwordService';
 import { PreregistedPasswordShowResponse } from '@/api/services/preregistedPassword/preregistedPasswordService';
+import { PreregistedPasswordService } from '@/api/services/preregistedPassword/preregistedPasswordService';
 import { formatDateTime } from '@/app/unregisted-passwords/_components/unregistedPasswordFormat';
 import ToggleOff from '@/assets/images/toggle-password/invisible.svg';
 import ToggleOn from '@/assets/images/toggle-password/visible.svg';
@@ -22,7 +22,6 @@ const PreregistedPasswordDetailView: React.FC<
   const router = useRouter();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [registerError, setRegisterError] = useState<string | undefined>();
   const passwordForDisplay = item.password ?? '-';
   const canTogglePassword = passwordForDisplay !== '-';
 
@@ -32,7 +31,6 @@ const PreregistedPasswordDetailView: React.FC<
     }
 
     setIsSubmitting(true);
-    setRegisterError(undefined);
 
     const response = await PasswordService.create({
       password: {
@@ -43,27 +41,17 @@ const PreregistedPasswordDetailView: React.FC<
     });
 
     if ('success' in response && response.success) {
-      router.push('/temp-passwords');
-      return;
-    }
+      const deleteResponse = await PreregistedPasswordService.delete(item.uuid);
 
-    if ('errors' in response && response.errors?.password) {
-      const firstError =
-        response.errors.password.password?.[0] ??
-        response.errors.password.application_id?.[0] ??
-        response.errors.password.account_id?.[0];
-      setRegisterError(firstError ?? '本登録に失敗しました。');
+      if (deleteResponse.success) {
+        router.push('/temp-passwords');
+        return;
+      }
+
       setIsSubmitting(false);
       return;
     }
 
-    if ('error' in response && response.error?.message) {
-      setRegisterError(response.error.message);
-      setIsSubmitting(false);
-      return;
-    }
-
-    setRegisterError('本登録に失敗しました。');
     setIsSubmitting(false);
   };
 
@@ -129,12 +117,7 @@ const PreregistedPasswordDetailView: React.FC<
 
       <div className="flex justify-center mt-14 gap-32">
         <CancelButton to="/temp-passwords" />
-        <div className="flex flex-col items-center">
-          <SubmitButton text="登録" onClick={handleRegister} />
-          {registerError && (
-            <ErrorMessage className="mt-2" message={registerError} />
-          )}
-        </div>
+        <SubmitButton text="登録" onClick={handleRegister} />
       </div>
     </>
   );

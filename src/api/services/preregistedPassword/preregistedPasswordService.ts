@@ -47,6 +47,10 @@ type ShowEnvelope =
       data?: PreregistedPasswordRaw;
     };
 
+export type PreregistedPasswordDeleteResponse = {
+  message?: string;
+};
+
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 
@@ -139,5 +143,15 @@ export class PreregistedPasswordService {
     config?: RequestConfig
   ): Promise<ApiResponse<ShowEnvelope>> {
     return apiClient.get(`/preregisted-passwords/${encodeURIComponent(uuid)}`, config);
+  }
+
+  static async delete(
+    uuid: string,
+    config?: RequestConfig
+  ): Promise<ApiResponse<PreregistedPasswordDeleteResponse>> {
+    return apiClient.delete(
+      `/preregisted-passwords/${encodeURIComponent(uuid)}`,
+      config
+    );
   }
 }

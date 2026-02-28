@@ -53,6 +53,10 @@ export type UnregistedPasswordDeleteAllResponse = {
   message?: string;
 };
 
+export type UnregistedPasswordDeleteResponse = {
+  message?: string;
+};
+
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 
@@ -148,6 +152,16 @@ export class UnregistedPasswordService {
     config?: RequestConfig
   ): Promise<ApiResponse<ShowEnvelope>> {
     return apiClient.get(`/unregisted-passwords/${encodeURIComponent(uuid)}`, config);
+  }
+
+  static async delete(
+    uuid: string,
+    config?: RequestConfig
+  ): Promise<ApiResponse<UnregistedPasswordDeleteResponse>> {
+    return apiClient.delete(
+      `/unregisted-passwords/${encodeURIComponent(uuid)}`,
+      config
+    );
   }
 
   static async deleteAll(
