@@ -5,35 +5,34 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import CancelButton from '@/components/button/CancelButton';
 import SubmitButton from '@/components/button/SubmitButton';
-import { UnregistedPasswordShowResponse } from '@/api/services/unregistedPassword/unregistedPasswordService';
+import { ErrorMessage } from '@/components/form/ErrorMessage';
 import { PasswordService } from '@/api/services/password/passwordService';
-import { formatDateTime } from '../../_components/unregistedPasswordFormat';
+import { PreregistedPasswordShowResponse } from '@/api/services/preregistedPassword/preregistedPasswordService';
+import { formatDateTime } from '@/app/unregisted-passwords/_components/unregistedPasswordFormat';
 import ToggleOff from '@/assets/images/toggle-password/invisible.svg';
 import ToggleOn from '@/assets/images/toggle-password/visible.svg';
 
-type UnregistedPasswordDetailViewProps = {
-  item: UnregistedPasswordShowResponse;
+type PreregistedPasswordDetailViewProps = {
+  item: PreregistedPasswordShowResponse;
 };
 
-const UnregistedPasswordDetailView: React.FC<
-  UnregistedPasswordDetailViewProps
+const PreregistedPasswordDetailView: React.FC<
+  PreregistedPasswordDetailViewProps
 > = ({ item }) => {
   const router = useRouter();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [registerError, setRegisterError] = useState<string | undefined>();
   const passwordForDisplay = item.password ?? '-';
   const canTogglePassword = passwordForDisplay !== '-';
-  const canRegister =
-    typeof item.application_id === 'number' &&
-    typeof item.account_id === 'number' &&
-    passwordForDisplay !== '-';
 
   const handleRegister = async () => {
-    if (!canRegister || isSubmitting) {
+    if (isSubmitting) {
       return;
     }
 
     setIsSubmitting(true);
+    setRegisterError(undefined);
 
     const response = await PasswordService.create({
       password: {
@@ -44,9 +43,27 @@ const UnregistedPasswordDetailView: React.FC<
     });
 
     if ('success' in response && response.success) {
-      router.push('/unregisted-passwords');
+      router.push('/temp-passwords');
       return;
     }
+
+    if ('errors' in response && response.errors?.password) {
+      const firstError =
+        response.errors.password.password?.[0] ??
+        response.errors.password.application_id?.[0] ??
+        response.errors.password.account_id?.[0];
+      setRegisterError(firstError ?? '本登録に失敗しました。');
+      setIsSubmitting(false);
+      return;
+    }
+
+    if ('error' in response && response.error?.message) {
+      setRegisterError(response.error.message);
+      setIsSubmitting(false);
+      return;
+    }
+
+    setRegisterError('本登録に失敗しました。');
     setIsSubmitting(false);
   };
 
@@ -111,11 +128,16 @@ const UnregistedPasswordDetailView: React.FC<
       </div>
 
       <div className="flex justify-center mt-14 gap-32">
-        <CancelButton to="/unregisted-passwords" />
-        <SubmitButton text="登録" onClick={handleRegister} />
+        <CancelButton to="/temp-passwords" />
+        <div className="flex flex-col items-center">
+          <SubmitButton text="登録" onClick={handleRegister} />
+          {registerError && (
+            <ErrorMessage className="mt-2" message={registerError} />
+          )}
+        </div>
       </div>
     </>
   );
 };
 
-export default UnregistedPasswordDetailView;
+export default PreregistedPasswordDetailView;
