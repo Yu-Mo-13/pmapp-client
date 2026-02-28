@@ -7,6 +7,7 @@ import CancelButton from '@/components/button/CancelButton';
 import SubmitButton from '@/components/button/SubmitButton';
 import { UnregistedPasswordShowResponse } from '@/api/services/unregistedPassword/unregistedPasswordService';
 import { PasswordService } from '@/api/services/password/passwordService';
+import { UnregistedPasswordService } from '@/api/services/unregistedPassword/unregistedPasswordService';
 import { formatDateTime } from '../../_components/unregistedPasswordFormat';
 import ToggleOff from '@/assets/images/toggle-password/invisible.svg';
 import ToggleOn from '@/assets/images/toggle-password/visible.svg';
@@ -44,9 +45,17 @@ const UnregistedPasswordDetailView: React.FC<
     });
 
     if ('success' in response && response.success) {
-      router.push('/unregisted-passwords');
+      const deleteResponse = await UnregistedPasswordService.delete(item.uuid);
+
+      if (deleteResponse.success) {
+        router.push('/unregisted-passwords');
+        return;
+      }
+
+      setIsSubmitting(false);
       return;
     }
+
     setIsSubmitting(false);
   };
 
