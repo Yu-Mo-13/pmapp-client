@@ -3,6 +3,17 @@ export { UserService } from './user/userService';
 export { ProductService } from './product/productService';
 export { ApplicationService } from './application/applicationService';
 export { MenuService, extractMenuItems } from './menu/menuService';
+export { PasswordService } from './password/passwordService';
+export {
+  PreregistedPasswordService,
+  extractPreregistedPasswordIndexRows,
+  extractPreregistedPasswordShow,
+} from './preregistedPassword/preregistedPasswordService';
+export {
+  UnregistedPasswordService,
+  extractUnregistedPasswordIndexRows,
+  extractUnregistedPasswordShow,
+} from './unregistedPassword/unregistedPasswordService';
 
 // サービス関連の型定義のエクスポート
 export type {
@@ -30,6 +41,20 @@ export type {
 } from './application/applicationService';
 
 export type { MenuIndexResponse } from './menu/menuService';
+export type {
+  PasswordCreateRequest,
+  PasswordCreateValidationError,
+  PasswordCreateApiResponse,
+} from './password/passwordService';
+export type {
+  PreregistedPasswordIndexRow,
+  PreregistedPasswordShowResponse,
+} from './preregistedPassword/preregistedPasswordService';
+export type {
+  UnregistedPasswordIndexRow,
+  UnregistedPasswordShowResponse,
+  UnregistedPasswordDeleteAllResponse,
+} from './unregistedPassword/unregistedPasswordService';
 
 // 将来のサービス追加例：
 // export { OrderService } from './orderService';
