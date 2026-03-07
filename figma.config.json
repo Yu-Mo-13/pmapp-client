@@ -1,0 +1,7 @@
+{
+  "codeConnect": {
+    "include": ["app/**", "components/**"],
+    "exclude": ["node_modules/**", ".next/**", "public/**"],
+    "parser": "react"
+  }
+}
