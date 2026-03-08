@@ -2,7 +2,7 @@ import React from 'react';
 import { Td, TableRowWrapper } from '@/components/table';
 import { PasswordIndexRow } from '../types';
 import Button from '@/components/Button';
-import { formatDateTimeToMinute } from '@/app/unregisted-passwords/_components/unregistedPasswordFormat';
+import { formatDateTimeToMinute } from '@/lib/dateFormat';
 
 type PasswordTrProps = {
   row: PasswordIndexRow;

@@ -2,8 +2,8 @@ import React from 'react';
 import { redirect } from 'next/navigation';
 import { Td, TableRowWrapper } from '@/components/table';
 import { UnregistedPasswordIndexRow } from '@/api/services/unregistedPassword/unregistedPasswordService';
-import { formatListDate } from './unregistedPasswordFormat';
 import Button from '@/components/Button';
+import { formatListDate } from '@/lib/dateFormat';
 
 type UnregistedPasswordTrProps = {
   row: UnregistedPasswordIndexRow;

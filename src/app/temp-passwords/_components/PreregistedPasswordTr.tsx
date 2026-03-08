@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { Td, TableRowWrapper } from '@/components/table';
 import Button from '@/components/Button';
 import { PreregistedPasswordIndexRow } from '@/api/services/preregistedPassword/preregistedPasswordService';
-import { formatListDate } from '@/app/unregisted-passwords/_components/unregistedPasswordFormat';
+import { formatListDate } from '@/lib/dateFormat';
 
 type PreregistedPasswordTrProps = {
   row: PreregistedPasswordIndexRow;
