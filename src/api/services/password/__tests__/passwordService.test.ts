@@ -1,4 +1,44 @@
-import { extractPasswordIndexRows } from '../passwordService';
+import apiClient from '@/api/client';
+import { extractPasswordIndexRows, PasswordService } from '../passwordService';
+
+describe('PasswordService.latest', () => {
+  it('account_id ありで最新パスワード取得APIを呼び出せる', async () => {
+    jest.spyOn(apiClient, 'get').mockResolvedValue({
+      success: true,
+      data: { password: 'secret' },
+    });
+
+    const response = await PasswordService.latest({
+      application_id: 10,
+      account_id: 20,
+    });
+
+    expect(response.success).toBe(true);
+    expect(response.data).toEqual({ password: 'secret' });
+    expect(apiClient.get).toHaveBeenCalledWith(
+      '/passwords/latest?application_id=10&account_id=20',
+      undefined
+    );
+  });
+
+  it('account_id なしで最新パスワード取得APIを呼び出せる', async () => {
+    jest.spyOn(apiClient, 'get').mockResolvedValue({
+      success: true,
+      data: { password: 'secret' },
+    });
+
+    const response = await PasswordService.latest({
+      application_id: 10,
+    });
+
+    expect(response.success).toBe(true);
+    expect(response.data).toEqual({ password: 'secret' });
+    expect(apiClient.get).toHaveBeenCalledWith(
+      '/passwords/latest?application_id=10',
+      undefined
+    );
+  });
+});
 
 describe('extractPasswordIndexRows', () => {
   it('application/account ネスト構造を一覧表示用に整形できる', () => {

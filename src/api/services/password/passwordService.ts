@@ -58,6 +58,15 @@ export type PasswordCreateApiResponse =
       errors?: PasswordCreateValidationError;
     };
 
+export interface PasswordLatestRequest {
+  application_id: number;
+  account_id?: number;
+}
+
+export interface PasswordLatestResponse {
+  password?: string;
+}
+
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
 
@@ -137,5 +146,20 @@ export class PasswordService {
     }
 
     return response;
+  }
+
+  static async latest(
+    request: PasswordLatestRequest,
+    config?: RequestConfig
+  ): Promise<ApiResponse<PasswordLatestResponse>> {
+    const query = new URLSearchParams({
+      application_id: `${request.application_id}`,
+    });
+
+    if (typeof request.account_id === 'number') {
+      query.set('account_id', `${request.account_id}`);
+    }
+
+    return apiClient.get(`/passwords/latest?${query.toString()}`, config);
   }
 }
