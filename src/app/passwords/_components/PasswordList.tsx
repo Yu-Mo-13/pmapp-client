@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useTransition } from 'react';
+import React, { useState, useTransition } from 'react';
 import Title from '@/components/Title';
 import PasswordTable from './PasswordTable';
 import { useRouter } from 'next/navigation';
@@ -9,7 +9,11 @@ import Image from 'next/image';
 import ArrowDown from '@/assets/images/arrow/arrowDown.svg';
 import { ErrorMessage } from '@/components/form/ErrorMessage';
 import { useQueryState } from 'nuqs';
-import { PasswordApplicationOption, PasswordIndexRow } from '../types';
+import {
+  PasswordActionMessage,
+  PasswordApplicationOption,
+  PasswordIndexRow,
+} from '../types';
 import { passwordApplicationIdParser } from '../_lib/searchParams';
 
 type PasswordListProps = {
@@ -29,6 +33,8 @@ const PasswordList: React.FC<PasswordListProps> = ({
 }) => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [actionMessage, setActionMessage] =
+    useState<PasswordActionMessage | null>(null);
   const [applicationId, setApplicationId] = useQueryState(
     'application_id',
     passwordApplicationIdParser.withOptions({
@@ -47,6 +53,7 @@ const PasswordList: React.FC<PasswordListProps> = ({
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     const value = event.target.value;
+    setActionMessage(null);
     void setApplicationId(value ? Number(value) : null);
   };
 
@@ -85,10 +92,21 @@ const PasswordList: React.FC<PasswordListProps> = ({
         </p>
       )}
 
+      {actionMessage?.type === 'success' && (
+        <p className="mb-4 text-sm text-green-600" aria-live="polite">
+          {actionMessage.text}
+        </p>
+      )}
+
+      {actionMessage?.type === 'error' && (
+        <ErrorMessage message={actionMessage.text} className="mb-4" />
+      )}
+
       {errorMessage && <ErrorMessage message={errorMessage} className="mb-4" />}
 
       <PasswordTable
         rows={rows}
+        onActionMessage={setActionMessage}
         emptyMessage={
           errorMessage
             ? 'パスワード一覧を表示できません。'

@@ -1,15 +1,17 @@
 import React from 'react';
 import { Th, TableRowWrapper } from '@/components/table';
-import { PasswordIndexRow } from '../types';
+import { PasswordActionMessage, PasswordIndexRow } from '../types';
 import PasswordTr from './PasswordTr';
 
 type PasswordTableProps = {
   rows: PasswordIndexRow[];
+  onActionMessage: (message: PasswordActionMessage | null) => void;
   emptyMessage?: string;
 };
 
 const PasswordTable: React.FC<PasswordTableProps> = ({
   rows,
+  onActionMessage,
   emptyMessage = '表示できるパスワードはありません。',
 }) => {
   const headerStyle = { backgroundColor: '#3E3E3E', borderColor: '#3E3E3E' };
@@ -49,6 +51,7 @@ const PasswordTable: React.FC<PasswordTableProps> = ({
               <PasswordTr
                 key={`${row.application_id}-${row.account_id ?? 'none'}`}
                 row={row}
+                onActionMessage={onActionMessage}
               />
             ))
           )}
