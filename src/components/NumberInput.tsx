@@ -8,30 +8,42 @@ import ArrowDown from '@/assets/images/arrow/arrowDown.svg';
 interface NumberInputProps {
   name: string;
   defaultValue?: number;
+  value?: number;
   min?: number;
   step?: number;
+  onChange?: (value: number) => void;
 }
 
 const NumberInput: React.FC<NumberInputProps> = ({
   name,
   defaultValue = 10,
+  value,
   min = 1,
   step = 1,
+  onChange,
 }) => {
-  const [value, setValue] = useState(defaultValue);
+  const [internalValue, setInternalValue] = useState(defaultValue);
+  const currentValue = value ?? internalValue;
+
+  const updateValue = (nextValue: number) => {
+    if (value === undefined) {
+      setInternalValue(nextValue);
+    }
+    onChange?.(nextValue);
+  };
 
   const handleIncrement = () => {
-    setValue((prev) => prev + step);
+    updateValue(currentValue + step);
   };
 
   const handleDecrement = () => {
-    setValue((prev) => Math.max(min, prev - step));
+    updateValue(Math.max(min, currentValue - step));
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = parseInt(e.target.value);
     if (!isNaN(newValue) && newValue >= min) {
-      setValue(newValue);
+      updateValue(newValue);
     }
   };
 
@@ -40,7 +52,7 @@ const NumberInput: React.FC<NumberInputProps> = ({
       <input
         type="number"
         name={name}
-        value={value}
+        value={currentValue}
         onChange={handleInputChange}
         min={min}
         step={step}
