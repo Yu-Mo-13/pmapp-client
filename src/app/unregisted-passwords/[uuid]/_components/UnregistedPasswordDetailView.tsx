@@ -8,7 +8,7 @@ import SubmitButton from '@/components/button/SubmitButton';
 import { UnregistedPasswordShowResponse } from '@/api/services/unregistedPassword/unregistedPasswordService';
 import { PasswordService } from '@/api/services/password/passwordService';
 import { UnregistedPasswordService } from '@/api/services/unregistedPassword/unregistedPasswordService';
-import { formatDateTime } from '../../_components/unregistedPasswordFormat';
+import { formatDateTime } from '@/lib/dateFormat';
 import ToggleOff from '@/assets/images/toggle-password/invisible.svg';
 import ToggleOn from '@/assets/images/toggle-password/visible.svg';
 
