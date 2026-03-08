@@ -10,7 +10,7 @@ import ArrowDown from '@/assets/images/arrow/arrowDown.svg';
 import { ErrorMessage } from '@/components/form/ErrorMessage';
 import { useQueryState } from 'nuqs';
 import { PasswordApplicationOption, PasswordIndexRow } from '../types';
-import { passwordApplicationIdParser } from '../searchParams';
+import { passwordApplicationIdParser } from '../_lib/searchParams';
 
 type PasswordListProps = {
   title: string;
