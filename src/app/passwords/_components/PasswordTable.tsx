@@ -10,7 +10,7 @@ type PasswordTableProps = {
 
 const PasswordTable: React.FC<PasswordTableProps> = ({
   rows,
-  emptyMessage = '表示できるアプリケーションはありません。',
+  emptyMessage = '表示できるパスワードはありません。',
 }) => {
   const headerStyle = { backgroundColor: '#3E3E3E', borderColor: '#3E3E3E' };
 
@@ -45,7 +45,12 @@ const PasswordTable: React.FC<PasswordTableProps> = ({
               </td>
             </tr>
           ) : (
-            rows.map((row, index) => <PasswordTr key={index} row={row} />)
+            rows.map((row) => (
+              <PasswordTr
+                key={`${row.application_id}-${row.account_id ?? 'none'}`}
+                row={row}
+              />
+            ))
           )}
         </tbody>
       </table>

@@ -1,21 +1,53 @@
-import React from 'react';
+'use client';
+
+import React, { useTransition } from 'react';
 import Title from '@/components/Title';
 import PasswordTable from './PasswordTable';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import SubmitButton from '@/components/button/SubmitButton';
 import Image from 'next/image';
 import ArrowDown from '@/assets/images/arrow/arrowDown.svg';
-import { PasswordIndexRow } from '../types';
+import { ErrorMessage } from '@/components/form/ErrorMessage';
+import { useQueryState } from 'nuqs';
+import { PasswordApplicationOption, PasswordIndexRow } from '../types';
+import { passwordApplicationIdParser } from '../_lib/searchParams';
 
 type PasswordListProps = {
   title: string;
   rows: PasswordIndexRow[];
+  applications: PasswordApplicationOption[];
+  selectedApplicationId?: string;
+  errorMessage?: string;
 };
 
-const PasswordList: React.FC<PasswordListProps> = ({ title, rows }) => {
-  const handleCreateClick = async () => {
-    'use server';
-    redirect('/passwords/create');
+const PasswordList: React.FC<PasswordListProps> = ({
+  title,
+  rows,
+  applications,
+  selectedApplicationId = '',
+  errorMessage,
+}) => {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [applicationId, setApplicationId] = useQueryState(
+    'application_id',
+    passwordApplicationIdParser.withOptions({
+      shallow: false,
+      startTransition,
+    })
+  );
+  const resolvedApplicationId =
+    applicationId?.toString() ?? selectedApplicationId ?? '';
+
+  const handleCreateClick = () => {
+    router.push('/passwords/create');
+  };
+
+  const handleApplicationChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const value = event.target.value;
+    void setApplicationId(value ? Number(value) : null);
   };
 
   return (
@@ -30,13 +62,16 @@ const PasswordList: React.FC<PasswordListProps> = ({ title, rows }) => {
         <div className="relative w-[97%] m-4 py-3">
           <select
             name="application_id"
-            defaultValue=""
+            value={resolvedApplicationId}
+            onChange={handleApplicationChange}
             className="w-full text-black px-4 py-3 pr-12 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent appearance-none"
           >
-            <option value="" disabled>
-              アプリケーションを選択してください
-            </option>
-            <option value={1}>アプリケーション名</option>
+            <option value="">すべてのアプリケーション</option>
+            {applications.map((application) => (
+              <option key={application.id} value={application.id}>
+                {application.name}
+              </option>
+            ))}
           </select>
           <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center">
             <Image src={ArrowDown} alt="選択" width={16} height={16} />
@@ -44,7 +79,22 @@ const PasswordList: React.FC<PasswordListProps> = ({ title, rows }) => {
         </div>
       </div>
 
-      <PasswordTable rows={rows} />
+      {isPending && (
+        <p className="mb-4 text-sm text-gray-600" aria-live="polite">
+          読み込み中...
+        </p>
+      )}
+
+      {errorMessage && <ErrorMessage message={errorMessage} className="mb-4" />}
+
+      <PasswordTable
+        rows={rows}
+        emptyMessage={
+          errorMessage
+            ? 'パスワード一覧を表示できません。'
+            : '表示できるパスワードはありません。'
+        }
+      />
     </main>
   );
 };

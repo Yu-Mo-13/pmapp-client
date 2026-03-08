@@ -2,6 +2,7 @@ import React from 'react';
 import { Td, TableRowWrapper } from '@/components/table';
 import { PasswordIndexRow } from '../types';
 import Button from '@/components/Button';
+import { formatDateTimeToMinute } from '@/lib/dateFormat';
 
 type PasswordTrProps = {
   row: PasswordIndexRow;
@@ -9,9 +10,8 @@ type PasswordTrProps = {
 
 const PasswordTr: React.FC<PasswordTrProps> = ({ row }) => {
   const borderStyle = { borderColor: '#d1d5db' };
-  const handleDetailClick = async () => {
-    'use server';
-    // パスワードをクリックボードにコピー
+  const handleDetailClick = () => {
+    // パスワード取得導線は別Issueで実装予定。
     console.log('Copying password to clipboard');
   };
 
@@ -21,7 +21,7 @@ const PasswordTr: React.FC<PasswordTrProps> = ({ row }) => {
         className="border-r text-left w-[130px] whitespace-nowrap"
         style={borderStyle}
       >
-        {row.latest_updated_at}
+        {formatDateTimeToMinute(row.latest_updated_at)}
       </Td>
 
       <Td
@@ -41,9 +41,7 @@ const PasswordTr: React.FC<PasswordTrProps> = ({ row }) => {
       </Td>
 
       <Td className="text-center">
-        <form action={handleDetailClick}>
-          <Button text="取得" onClick={handleDetailClick} />
-        </form>
+        <Button text="取得" onClick={handleDetailClick} />
       </Td>
     </TableRowWrapper>
   );

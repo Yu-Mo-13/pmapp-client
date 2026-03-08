@@ -1,5 +1,6 @@
-export interface PasswordIndexRow {
-  latest_updated_at: string;
-  application_name: string;
-  account_name: string;
+export type { PasswordIndexRow } from '@/api/services/password/passwordService';
+
+export interface PasswordApplicationOption {
+  id: number;
+  name: string;
 }

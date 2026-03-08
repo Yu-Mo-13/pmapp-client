@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { cookies } from 'next/headers';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import './globals.css';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
@@ -33,13 +34,15 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="min-h-screen bg-gray-100">
-          <Header userName={userName ?? 'ゲスト'} />
-          <div className="flex">
-            <Sidebar />
-            {children}
+        <NuqsAdapter>
+          <div className="min-h-screen bg-gray-100">
+            <Header userName={userName ?? 'ゲスト'} />
+            <div className="flex">
+              <Sidebar />
+              {children}
+            </div>
           </div>
-        </div>
+        </NuqsAdapter>
       </body>
     </html>
   );
