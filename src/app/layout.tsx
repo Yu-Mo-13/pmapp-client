@@ -1,10 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
-import { cookies } from 'next/headers';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import './globals.css';
-import Header from '@/components/Header';
-import Sidebar from '@/components/Sidebar';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -26,22 +23,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
-  const userName = cookieStore.get('auth_user_name')?.value;
-
   return (
     <html lang="ja">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NuqsAdapter>
-          <div className="min-h-screen bg-gray-100">
-            <Header userName={userName ?? 'ゲスト'} />
-            <div className="flex">
-              <Sidebar />
-              {children}
-            </div>
-          </div>
+          {children}
         </NuqsAdapter>
       </body>
     </html>
