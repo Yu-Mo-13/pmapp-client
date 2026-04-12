@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PasswordService } from '@/api/services/password/passwordService';
+import { formatDateTimeToMinute } from '@/lib/dateFormat';
 import PasswordTr from '../PasswordTr';
 
 describe('PasswordTr', () => {
@@ -144,7 +145,9 @@ describe('PasswordTr', () => {
       <PasswordTr row={row} onActionMessage={onActionMessage} variant="card" />
     );
 
-    expect(screen.getByText('更新日: 2026-03-08 12:34')).toBeInTheDocument();
+    expect(
+      screen.getByText(`更新日: ${formatDateTimeToMinute(row.latest_updated_at)}`)
+    ).toBeInTheDocument();
     expect(
       screen.getByText('アプリケーション名: GitHub')
     ).toBeInTheDocument();
