@@ -16,8 +16,8 @@ const PreregistedPasswordList: React.FC<PreregistedPasswordListProps> = ({
   errorMessage,
 }) => {
   return (
-    <main className="flex-1 p-6" role="main">
-      <div className="flex justify-between items-center mb-8">
+    <main className="flex-1 p-4 md:p-6" role="main">
+      <div className="mb-6 flex flex-col gap-4 md:mb-8 md:flex-row md:items-center md:justify-between [&_h2]:mb-0">
         <Title title={title} />
       </div>
 

@@ -2,19 +2,36 @@ import React from 'react';
 import { redirect } from 'next/navigation';
 import { Td, TableRowWrapper } from '@/components/table';
 import Button from '@/components/Button';
+import MobileInfoCard from '@/components/MobileInfoCard';
 import { PreregistedPasswordIndexRow } from '@/api/services/preregistedPassword/preregistedPasswordService';
 import { formatListDate } from '@/lib/dateFormat';
 
 type PreregistedPasswordTrProps = {
   row: PreregistedPasswordIndexRow;
+  variant?: 'table' | 'card';
 };
 
-const PreregistedPasswordTr: React.FC<PreregistedPasswordTrProps> = ({ row }) => {
+const PreregistedPasswordTr: React.FC<PreregistedPasswordTrProps> = ({
+  row,
+  variant = 'table',
+}) => {
   const borderStyle = { borderColor: '#d1d5db' };
   const handleDetailClick = async () => {
     'use server';
     redirect(`/temp-passwords/${encodeURIComponent(row.uuid)}`);
   };
+
+  if (variant === 'card') {
+    return (
+      <MobileInfoCard
+        href={`/temp-passwords/${encodeURIComponent(row.uuid)}`}
+        headerText={`登録日: ${formatListDate(row.created_at)}`}
+        primaryText={`アプリケーション名: ${row.application_name}`}
+        secondaryText={`アカウント名: ${row.account_name}`}
+        centerContent
+      />
+    );
+  }
 
   return (
     <TableRowWrapper>
