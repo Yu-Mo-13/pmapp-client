@@ -92,6 +92,8 @@ describe('PasswordList', () => {
     );
 
     expect(screen.getByText('入力データに問題があります。')).toBeInTheDocument();
-    expect(screen.getByText('パスワード一覧を表示できません。')).toBeInTheDocument();
+    expect(
+      screen.getAllByText('パスワード一覧を表示できません。')
+    ).not.toHaveLength(0);
   });
 });

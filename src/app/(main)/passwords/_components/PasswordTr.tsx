@@ -9,6 +9,7 @@ import { formatDateTimeToMinute } from '@/lib/dateFormat';
 type PasswordTrProps = {
   row: PasswordIndexRow;
   onActionMessage: (message: PasswordActionMessage | null) => void;
+  variant?: 'table' | 'card';
 };
 
 const PASSWORD_NOT_FOUND_MESSAGE =
@@ -16,7 +17,14 @@ const PASSWORD_NOT_FOUND_MESSAGE =
 const PASSWORD_COPY_SUCCESS_MESSAGE = 'パスワードをコピーしました。';
 const PASSWORD_COPY_ERROR_MESSAGE = 'パスワードのコピーに失敗しました。';
 
-const PasswordTr: React.FC<PasswordTrProps> = ({ row, onActionMessage }) => {
+const actionButtonClassName =
+  'text-white rounded text-sm font-medium bg-[#3CB371] hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-opacity duration-200 disabled:cursor-not-allowed disabled:opacity-60';
+
+const PasswordTr: React.FC<PasswordTrProps> = ({
+  row,
+  onActionMessage,
+  variant = 'table',
+}) => {
   const borderStyle = { borderColor: '#d1d5db' };
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,7 +51,8 @@ const PasswordTr: React.FC<PasswordTrProps> = ({ row, onActionMessage }) => {
         text:
           response.error?.status === 404
             ? PASSWORD_NOT_FOUND_MESSAGE
-            : response.error?.message ?? '最新パスワードの取得に失敗しました。',
+            : (response.error?.message ??
+              '最新パスワードの取得に失敗しました。'),
       });
       return;
     }
@@ -78,6 +87,42 @@ const PasswordTr: React.FC<PasswordTrProps> = ({ row, onActionMessage }) => {
     }
   };
 
+  if (variant === 'card') {
+    return (
+      <button
+        type="button"
+        onClick={handleGetLatestPassword}
+        disabled={isLoading}
+        className="block min-h-[150px] w-full max-w-[335px] rounded-md border border-[#334155] bg-white p-4 text-left shadow-[8px_8px_0_rgba(0,0,0,0.18)] transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        <dl className="text-gray-900">
+          <div className="space-y-1">
+            <dd className="text-[15px] font-normal text-gray-900">
+              {`更新日: ${formatDateTimeToMinute(row.latest_updated_at)}`}
+            </dd>
+          </div>
+          <div
+            className="mb-3 mt-[3px] h-px w-full bg-[#334155]"
+            aria-hidden="true"
+          />
+          <div className="space-y-2">
+            <dd className="break-all text-[16px] font-semibold leading-6">
+              {`アプリケーション名: ${row.application_name}`}
+            </dd>
+          </div>
+          <div className="mt-2 space-y-2">
+            <dd className="break-all text-[16px] font-semibold leading-6">
+              {`アカウント名: ${row.account_name}`}
+            </dd>
+          </div>
+        </dl>
+        {isLoading && (
+          <p className="mt-4 text-sm font-medium text-[#3CB371]">取得中...</p>
+        )}
+      </button>
+    );
+  }
+
   return (
     <TableRowWrapper>
       <Td
@@ -108,7 +153,7 @@ const PasswordTr: React.FC<PasswordTrProps> = ({ row, onActionMessage }) => {
           type="button"
           onClick={handleGetLatestPassword}
           disabled={isLoading}
-          className="text-white px-6 py-3 rounded text-sm font-medium bg-[#3CB371] hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-opacity duration-200 disabled:cursor-not-allowed disabled:opacity-60"
+          className={`${actionButtonClassName} px-6 py-3`}
         >
           {isLoading ? '取得中...' : '取得'}
         </button>

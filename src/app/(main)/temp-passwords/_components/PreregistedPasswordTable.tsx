@@ -15,38 +15,54 @@ const PreregistedPasswordTable: React.FC<PreregistedPasswordTableProps> = ({
   const headerStyle = { backgroundColor: '#3E3E3E', borderColor: '#3E3E3E' };
 
   return (
-    <div className="bg-white shadow overflow-hidden">
-      <table className="w-full" role="table" aria-label="仮登録パスワード一覧">
-        <thead>
-          <TableRowWrapper className="text-white">
-            <Th className="border-r w-[130px]" style={headerStyle}>
-              登録日
-            </Th>
-            <Th className="border-r" style={headerStyle}>
-              アプリケーション名
-            </Th>
-            <Th className="border-r" style={headerStyle}>
-              アカウント名
-            </Th>
-            <Th className="w-[220px]" style={headerStyle}>
-              {''}
-            </Th>
-          </TableRowWrapper>
-        </thead>
+    <>
+      <div className="space-y-4 md:hidden">
+        {rows.length === 0 ? (
+          <div className="rounded-md border border-[#D9D9D9] bg-white px-4 py-6 text-center text-gray-600 shadow-[8px_8px_0_rgba(0,0,0,0.18)]">
+            {emptyMessage}
+          </div>
+        ) : (
+          rows.map((row) => (
+            <PreregistedPasswordTr key={`${row.uuid}-card`} row={row} variant="card" />
+          ))
+        )}
+      </div>
 
-        <tbody className="divide-y divide-gray-200">
-          {rows.length === 0 ? (
-            <tr>
-              <td colSpan={4} className="px-6 py-6 text-center text-gray-600">
-                {emptyMessage}
-              </td>
-            </tr>
-          ) : (
-            rows.map((row) => <PreregistedPasswordTr key={row.uuid} row={row} />)
-          )}
-        </tbody>
-      </table>
-    </div>
+      <div className="hidden overflow-hidden bg-white shadow md:block">
+        <table className="w-full" role="table" aria-label="仮登録パスワード一覧">
+          <thead>
+            <TableRowWrapper className="text-white">
+              <Th className="border-r w-[130px]" style={headerStyle}>
+                登録日
+              </Th>
+              <Th className="border-r" style={headerStyle}>
+                アプリケーション名
+              </Th>
+              <Th className="border-r" style={headerStyle}>
+                アカウント名
+              </Th>
+              <Th className="w-[220px]" style={headerStyle}>
+                {''}
+              </Th>
+            </TableRowWrapper>
+          </thead>
+
+          <tbody className="divide-y divide-gray-200">
+            {rows.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="px-6 py-6 text-center text-gray-600">
+                  {emptyMessage}
+                </td>
+              </tr>
+            ) : (
+              rows.map((row) => (
+                <PreregistedPasswordTr key={`${row.uuid}-table`} row={row} />
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 };
 

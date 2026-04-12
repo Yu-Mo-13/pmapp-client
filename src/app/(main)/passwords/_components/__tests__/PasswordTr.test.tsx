@@ -34,7 +34,7 @@ describe('PasswordTr', () => {
       </table>
     );
 
-    await user.click(screen.getByRole('button', { name: '取得' }));
+    await user.click(screen.getByRole('button'));
 
     await waitFor(() => {
       expect(PasswordService.latest).toHaveBeenCalledWith({
@@ -67,7 +67,7 @@ describe('PasswordTr', () => {
       </table>
     );
 
-    await user.click(screen.getByRole('button', { name: '取得' }));
+    await user.click(screen.getByRole('button'));
 
     await waitFor(() => {
       expect(PasswordService.latest).toHaveBeenCalledWith({
@@ -92,7 +92,7 @@ describe('PasswordTr', () => {
       </table>
     );
 
-    await user.click(screen.getByRole('button', { name: '取得' }));
+    await user.click(screen.getByRole('button'));
 
     await waitFor(() => {
       expect(onActionMessage).toHaveBeenLastCalledWith({
@@ -128,6 +128,38 @@ describe('PasswordTr', () => {
       expect(onActionMessage).toHaveBeenLastCalledWith({
         type: 'error',
         text: 'パスワードのコピーに失敗しました。',
+      });
+    });
+  });
+
+  it('カード表示でも取得操作ができる', async () => {
+    const user = userEvent.setup();
+
+    jest.spyOn(PasswordService, 'latest').mockResolvedValue({
+      success: true,
+      data: { password: 'secret-password' },
+    });
+
+    render(
+      <PasswordTr row={row} onActionMessage={onActionMessage} variant="card" />
+    );
+
+    expect(screen.getByText('更新日: 2026-03-08 12:34')).toBeInTheDocument();
+    expect(
+      screen.getByText('アプリケーション名: GitHub')
+    ).toBeInTheDocument();
+    expect(screen.getByText('アカウント名: octocat')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button'));
+
+    await waitFor(() => {
+      expect(PasswordService.latest).toHaveBeenCalledWith({
+        application_id: 10,
+        account_id: 20,
+      });
+      expect(onActionMessage).toHaveBeenLastCalledWith({
+        type: 'success',
+        text: 'パスワードをコピーしました。',
       });
     });
   });
