@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Td, TableRowWrapper } from '@/components/table';
+import MobileInfoCard from '@/components/MobileInfoCard';
 import { PasswordService } from '@/api/services/password/passwordService';
 import { PasswordActionMessage, PasswordIndexRow } from '../types';
 import { formatDateTimeToMinute } from '@/lib/dateFormat';
@@ -89,37 +90,14 @@ const PasswordTr: React.FC<PasswordTrProps> = ({
 
   if (variant === 'card') {
     return (
-      <button
-        type="button"
+      <MobileInfoCard
         onClick={handleGetLatestPassword}
         disabled={isLoading}
-        className="block min-h-[150px] w-full max-w-[335px] rounded-md border border-[#334155] bg-white p-4 text-left shadow-[8px_8px_0_rgba(0,0,0,0.18)] transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        <dl className="text-gray-900">
-          <div className="space-y-1">
-            <dd className="text-[15px] font-normal text-gray-900">
-              {`更新日: ${formatDateTimeToMinute(row.latest_updated_at)}`}
-            </dd>
-          </div>
-          <div
-            className="mb-3 mt-[3px] h-px w-full bg-[#334155]"
-            aria-hidden="true"
-          />
-          <div className="space-y-2">
-            <dd className="break-all text-[16px] font-semibold leading-6">
-              {`アプリケーション名: ${row.application_name}`}
-            </dd>
-          </div>
-          <div className="mt-2 space-y-2">
-            <dd className="break-all text-[16px] font-semibold leading-6">
-              {`アカウント名: ${row.account_name}`}
-            </dd>
-          </div>
-        </dl>
-        {isLoading && (
-          <p className="mt-4 text-sm font-medium text-[#3CB371]">取得中...</p>
-        )}
-      </button>
+        headerText={`更新日: ${formatDateTimeToMinute(row.latest_updated_at)}`}
+        primaryText={`アプリケーション名: ${row.application_name}`}
+        secondaryText={`アカウント名: ${row.account_name}`}
+        statusText={isLoading ? '取得中...' : undefined}
+      />
     );
   }
 

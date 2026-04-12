@@ -1,5 +1,6 @@
 import React from 'react';
 import { Th, TableRowWrapper } from '@/components/table';
+import MobileEmptyState from '@/components/MobileEmptyState';
 import { PasswordActionMessage, PasswordIndexRow } from '../types';
 import PasswordTr from './PasswordTr';
 
@@ -20,9 +21,7 @@ const PasswordTable: React.FC<PasswordTableProps> = ({
     <>
       <div className="space-y-4 md:hidden">
         {rows.length === 0 ? (
-          <div className="rounded-md border border-[#D9D9D9] bg-white px-4 py-6 text-center text-gray-600 shadow-[8px_8px_0_rgba(0,0,0,0.18)]">
-            {emptyMessage}
-          </div>
+          <MobileEmptyState message={emptyMessage} />
         ) : (
           rows.map((row) => (
             <PasswordTr
