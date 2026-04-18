@@ -1,5 +1,5 @@
 import apiClient from '../../client';
-import { ApiResponse } from '../../types';
+import { ApiResponse, RequestConfig } from '../../types';
 import { extractValidationErrors } from '../../utils/validationErrorTransformer';
 
 export interface LoginRequest {
@@ -17,7 +17,12 @@ export interface LoginResponse {
 export interface LoginStatusResponse {
   name: string;
   top_page_url?: string;
+  role?: {
+    code: string;
+  } | null;
 }
+
+export type AppUserRole = 'admin' | 'general' | 'mobile';
 
 export interface LoginValidationError {
   email?: string[];
@@ -46,14 +51,103 @@ export class AuthService {
     return response as ApiResponse<LoginResponse>;
   }
 
-  static async loginStatus(): Promise<ApiResponse<LoginStatusResponse>> {
-    return apiClient.get<LoginStatusResponse>('/login/status');
+  static async loginStatus(
+    config?: RequestConfig
+  ): Promise<ApiResponse<LoginStatusResponse>> {
+    return apiClient.get<LoginStatusResponse>('/login/status', config);
   }
 
   static async logout(): Promise<ApiResponse<void>> {
     return apiClient.post<void>('/logout');
   }
 }
+
+const ROLE_PATTERNS: Array<{
+  role: AppUserRole;
+  patterns: RegExp[];
+}> = [
+  {
+    role: 'admin',
+    patterns: [/^admin$/, /^administrator$/, /^システム管理者$/],
+  },
+  {
+    role: 'general',
+    patterns: [/^web_user$/, /^general$/, /^general[_\s-]?user$/, /^web一般ユーザー$/],
+  },
+  {
+    role: 'mobile',
+    patterns: [/^mobile_user$/, /^mobile$/, /^mobile[_\s-]?user$/, /^mobile一般ユーザー$/],
+  },
+];
+
+const normalizeRoleText = (value: string): string =>
+  value.trim().toLowerCase().replace(/\s+/g, '_');
+
+const extractRoleFromTopPageUrl = (value: unknown): AppUserRole | null => {
+  const topPageUrl = extractTopPageUrl(value);
+
+  if (topPageUrl === '/applications' || topPageUrl === '/accounts') {
+    return 'admin';
+  }
+
+  if (topPageUrl === '/unregisted-passwords') {
+    return 'general';
+  }
+
+  if (topPageUrl === '/temp-passwords') {
+    return 'mobile';
+  }
+
+  return null;
+};
+
+export const normalizeUserRole = (value: unknown): AppUserRole | null => {
+  if (typeof value !== 'string') {
+    return null;
+  }
+
+  const normalized = normalizeRoleText(value);
+  const matchedRole = ROLE_PATTERNS.find(({ patterns }) =>
+    patterns.some((pattern) => pattern.test(normalized))
+  );
+
+  return matchedRole?.role ?? null;
+};
+
+export const extractUserRole = (value: unknown): AppUserRole | null => {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const obj = value as Record<string, unknown>;
+  const roleCandidates = [
+    typeof obj.role === 'object' && obj.role !== null
+      ? (obj.role as Record<string, unknown>).code
+      : obj.role,
+    obj.role_name,
+    obj.roleName,
+    obj.user_role,
+    obj.userRole,
+  ];
+
+  const resolvedRole = roleCandidates
+    .map((candidate) => normalizeUserRole(candidate))
+    .find((candidate): candidate is AppUserRole => candidate !== null);
+
+  if (resolvedRole) {
+    return resolvedRole;
+  }
+
+  const nestedCandidates = [obj.user, obj.account, obj.data];
+  for (const nestedCandidate of nestedCandidates) {
+    const nestedRole = extractUserRole(nestedCandidate);
+    if (nestedRole) {
+      return nestedRole;
+    }
+  }
+
+  return extractRoleFromTopPageUrl(obj);
+};
 
 export const extractUserName = (value: unknown): string | null => {
   if (!value || typeof value !== 'object') {
@@ -158,6 +252,29 @@ export const extractUserNameFromToken = (token: string): string | null => {
         typeof candidate === 'string' && candidate.trim().length > 0
     );
     return fallback ?? null;
+  } catch {
+    return null;
+  }
+};
+
+export const extractUserRoleFromToken = (token: string): AppUserRole | null => {
+  if (!token) {
+    return null;
+  }
+
+  const parts = token.split('.');
+  if (parts.length < 2) {
+    return null;
+  }
+
+  const payloadText = decodeBase64Url(parts[1]);
+  if (!payloadText) {
+    return null;
+  }
+
+  try {
+    const payload = JSON.parse(payloadText) as Record<string, unknown>;
+    return extractUserRole(payload);
   } catch {
     return null;
   }
