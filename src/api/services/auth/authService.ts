@@ -83,25 +83,7 @@ const ROLE_PATTERNS: Array<{
 const normalizeRoleText = (value: string): string =>
   value.trim().toLowerCase().replace(/\s+/g, '_');
 
-const extractRoleFromTopPageUrl = (value: unknown): AppUserRole | null => {
-  const topPageUrl = extractTopPageUrl(value);
-
-  if (topPageUrl === '/applications' || topPageUrl === '/accounts') {
-    return 'admin';
-  }
-
-  if (topPageUrl === '/unregisted-passwords') {
-    return 'general';
-  }
-
-  if (topPageUrl === '/temp-passwords') {
-    return 'mobile';
-  }
-
-  return null;
-};
-
-export const normalizeUserRole = (value: unknown): AppUserRole | null => {
+const normalizeUserRole = (value: unknown): AppUserRole | null => {
   if (typeof value !== 'string') {
     return null;
   }
@@ -120,33 +102,12 @@ export const extractUserRole = (value: unknown): AppUserRole | null => {
   }
 
   const obj = value as Record<string, unknown>;
-  const roleCandidates = [
+  const roleCode =
     typeof obj.role === 'object' && obj.role !== null
       ? (obj.role as Record<string, unknown>).code
-      : obj.role,
-    obj.role_name,
-    obj.roleName,
-    obj.user_role,
-    obj.userRole,
-  ];
+      : undefined;
 
-  const resolvedRole = roleCandidates
-    .map((candidate) => normalizeUserRole(candidate))
-    .find((candidate): candidate is AppUserRole => candidate !== null);
-
-  if (resolvedRole) {
-    return resolvedRole;
-  }
-
-  const nestedCandidates = [obj.user, obj.account, obj.data];
-  for (const nestedCandidate of nestedCandidates) {
-    const nestedRole = extractUserRole(nestedCandidate);
-    if (nestedRole) {
-      return nestedRole;
-    }
-  }
-
-  return extractRoleFromTopPageUrl(obj);
+  return normalizeUserRole(roleCode);
 };
 
 export const extractUserName = (value: unknown): string | null => {
@@ -252,29 +213,6 @@ export const extractUserNameFromToken = (token: string): string | null => {
         typeof candidate === 'string' && candidate.trim().length > 0
     );
     return fallback ?? null;
-  } catch {
-    return null;
-  }
-};
-
-export const extractUserRoleFromToken = (token: string): AppUserRole | null => {
-  if (!token) {
-    return null;
-  }
-
-  const parts = token.split('.');
-  if (parts.length < 2) {
-    return null;
-  }
-
-  const payloadText = decodeBase64Url(parts[1]);
-  if (!payloadText) {
-    return null;
-  }
-
-  try {
-    const payload = JSON.parse(payloadText) as Record<string, unknown>;
-    return extractUserRole(payload);
   } catch {
     return null;
   }

@@ -24,11 +24,11 @@ jest.mock('@/api/services/auth/authService', () => ({
     if (roleCode === 'WEB_USER') {
       return 'general';
     }
+    if (roleCode === 'MOBILE_USER') {
+      return 'mobile';
+    }
     return null;
   }),
-  extractUserRoleFromToken: jest.fn((token: string) =>
-    token === 'mobile-token' ? 'mobile' : null
-  ),
 }));
 
 jest.mock('../serverAuthConfig', () => ({
@@ -85,12 +85,23 @@ describe('authorizePageAccess', () => {
     expect(notFound).toHaveBeenCalled();
   });
 
-  it('login status にロールが無い場合はトークンをフォールバックで使う', async () => {
+  it('login status が 500 の場合も 404 にする', async () => {
+    mockLoginStatus.mockResolvedValue({
+      success: false,
+      error: { message: 'server error', status: 500 },
+    });
+
+    await expect(
+      authorizePageAccess([APP_USER_ROLES.admin])
+    ).rejects.toThrow('NEXT_NOT_FOUND');
+    expect(notFound).toHaveBeenCalled();
+  });
+
+  it('許可されたモバイルロールなら通す', async () => {
     mockLoginStatus.mockResolvedValue({
       success: true,
-      data: { name: 'tester' },
+      data: { name: 'tester', role: { code: 'MOBILE_USER' } },
     });
-    mockGetServerAuthToken.mockResolvedValue('mobile-token');
 
     await expect(
       authorizePageAccess([APP_USER_ROLES.mobile])
