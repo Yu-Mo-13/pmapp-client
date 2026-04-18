@@ -13,6 +13,7 @@ export interface LoginFormState {
   message?: string; // Optional: General message for non-field specific errors
   shouldRedirect?: boolean;
   accessToken?: string;
+  topPageUrl?: string;
 }
 
 export async function loginAction(
@@ -59,6 +60,7 @@ export async function loginAction(
         message: 'Login successful.',
         shouldRedirect: true, // 成功時にリダイレクトフラグを立てる
         accessToken,
+        topPageUrl: response.data?.top_page_url,
       };
     }
 

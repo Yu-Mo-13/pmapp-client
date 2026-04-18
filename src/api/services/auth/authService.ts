@@ -11,10 +11,12 @@ export interface LoginRequest {
 export interface LoginResponse {
   access_token?: string;
   token?: string;
+  top_page_url?: string;
 }
 
 export interface LoginStatusResponse {
   name: string;
+  top_page_url?: string;
 }
 
 export interface LoginValidationError {
@@ -86,6 +88,24 @@ export const extractUserName = (value: unknown): string | null => {
   }
 
   return extractUserName(obj.data);
+};
+
+export const extractTopPageUrl = (value: unknown): string | null => {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const obj = value as Record<string, unknown>;
+  const candidates = [obj.top_page_url, obj.topPageUrl, obj.top_page_path];
+  const found = candidates.find(
+    (candidate): candidate is string =>
+      typeof candidate === 'string' && candidate.startsWith('/')
+  );
+  if (found) {
+    return found;
+  }
+
+  return extractTopPageUrl(obj.data);
 };
 
 const decodeBase64Url = (value: string): string | null => {
