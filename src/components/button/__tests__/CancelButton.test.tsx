@@ -115,6 +115,15 @@ describe('CancelButton', () => {
     });
   });
 
+  describe('className', () => {
+    it('追加クラスを適用できる', () => {
+      render(<CancelButton to="/test" className="w-[100px] text-[16px]" />);
+
+      const link = screen.getByRole('link');
+      expect(link).toHaveClass('w-[100px]', 'text-[16px]');
+    });
+  });
+
   describe('ユーザビリティ', () => {
     it('ボタンらしい見た目を持つ', () => {
       render(<CancelButton to="/test" />);
