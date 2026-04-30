@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Td, TableRowWrapper } from '@/components/table';
+import MobileInfoCard from '@/components/MobileInfoCard';
 import { PasswordService } from '@/api/services/password/passwordService';
 import { PasswordActionMessage, PasswordIndexRow } from '../types';
 import { formatDateTimeToMinute } from '@/lib/dateFormat';
@@ -9,6 +10,7 @@ import { formatDateTimeToMinute } from '@/lib/dateFormat';
 type PasswordTrProps = {
   row: PasswordIndexRow;
   onActionMessage: (message: PasswordActionMessage | null) => void;
+  variant?: 'table' | 'card';
 };
 
 const PASSWORD_NOT_FOUND_MESSAGE =
@@ -16,7 +18,14 @@ const PASSWORD_NOT_FOUND_MESSAGE =
 const PASSWORD_COPY_SUCCESS_MESSAGE = 'パスワードをコピーしました。';
 const PASSWORD_COPY_ERROR_MESSAGE = 'パスワードのコピーに失敗しました。';
 
-const PasswordTr: React.FC<PasswordTrProps> = ({ row, onActionMessage }) => {
+const actionButtonClassName =
+  'text-white rounded text-sm font-medium bg-[#3CB371] hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-opacity duration-200 disabled:cursor-not-allowed disabled:opacity-60';
+
+const PasswordTr: React.FC<PasswordTrProps> = ({
+  row,
+  onActionMessage,
+  variant = 'table',
+}) => {
   const borderStyle = { borderColor: '#d1d5db' };
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,7 +52,8 @@ const PasswordTr: React.FC<PasswordTrProps> = ({ row, onActionMessage }) => {
         text:
           response.error?.status === 404
             ? PASSWORD_NOT_FOUND_MESSAGE
-            : response.error?.message ?? '最新パスワードの取得に失敗しました。',
+            : (response.error?.message ??
+              '最新パスワードの取得に失敗しました。'),
       });
       return;
     }
@@ -78,6 +88,19 @@ const PasswordTr: React.FC<PasswordTrProps> = ({ row, onActionMessage }) => {
     }
   };
 
+  if (variant === 'card') {
+    return (
+      <MobileInfoCard
+        onClick={handleGetLatestPassword}
+        disabled={isLoading}
+        headerText={`更新日: ${formatDateTimeToMinute(row.latest_updated_at)}`}
+        primaryText={`アプリケーション名: ${row.application_name}`}
+        secondaryText={`アカウント名: ${row.account_name}`}
+        statusText={isLoading ? '取得中...' : undefined}
+      />
+    );
+  }
+
   return (
     <TableRowWrapper>
       <Td
@@ -108,7 +131,7 @@ const PasswordTr: React.FC<PasswordTrProps> = ({ row, onActionMessage }) => {
           type="button"
           onClick={handleGetLatestPassword}
           disabled={isLoading}
-          className="text-white px-6 py-3 rounded text-sm font-medium bg-[#3CB371] hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-opacity duration-200 disabled:cursor-not-allowed disabled:opacity-60"
+          className={`${actionButtonClassName} px-6 py-3`}
         >
           {isLoading ? '取得中...' : '取得'}
         </button>

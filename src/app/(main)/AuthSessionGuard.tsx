@@ -6,6 +6,7 @@ import { apiClient } from '@/api';
 import { AuthService } from '@/api/services/auth/authService';
 
 const LOGIN_PATH = '/login';
+const SESSION_POLL_INTERVAL_MS = 60_000;
 
 const hasAuthTokenCookie = () => {
   if (typeof document === 'undefined') {
@@ -82,7 +83,7 @@ export default function AuthSessionGuard() {
     document.addEventListener('visibilitychange', handleAuthTokenUpdated);
     const intervalId = window.setInterval(() => {
       void validateSession();
-    }, 1000);
+    }, SESSION_POLL_INTERVAL_MS);
 
     return () => {
       ignore = true;

@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
 import { cookies } from 'next/headers';
-import Header from '@/components/Header';
-import Sidebar from '@/components/Sidebar';
 import AuthSessionGuard from './AuthSessionGuard';
+import MainShell from './MainShell';
 
 type MainLayoutProps = {
   children: ReactNode;
@@ -15,11 +14,7 @@ export default async function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="min-h-screen bg-gray-100">
       <AuthSessionGuard />
-      <Header userName={userName ?? 'ゲスト'} />
-      <div className="flex">
-        <Sidebar />
-        {children}
-      </div>
+      <MainShell userName={userName ?? 'ゲスト'}>{children}</MainShell>
     </div>
   );
 }

@@ -103,4 +103,37 @@ describe('PreregistedPasswordDetailView', () => {
       expect(mockPush).not.toHaveBeenCalled();
     });
   });
+
+  it('モバイル向けに詳細項目と操作ボタンを縦積みレイアウトで表示する', () => {
+    render(<PreregistedPasswordDetailView item={item} />);
+
+    expect(screen.getByText('アプリケーション').parentElement).toHaveClass('flex', 'flex-col', 'gap-2');
+    expect(screen.getByText('アカウント名').parentElement).toHaveClass('flex', 'flex-col', 'gap-2');
+    expect(
+      screen.getByRole('link', { name: 'キャンセル' }).parentElement?.parentElement
+    ).toHaveClass('flex', 'flex-row', 'justify-center', 'gap-4');
+    expect(screen.getByRole('link', { name: 'キャンセル' })).toHaveClass('w-[162px]', 'md:w-auto');
+    expect(screen.getByRole('button', { name: '登録' })).toHaveClass('w-[162px]', 'md:w-36');
+  });
+
+  it('パスワード欄でSPは24x24相当、PCは44x24相当の表示領域を持つ', () => {
+    render(<PreregistedPasswordDetailView item={item} />);
+
+    expect(screen.getByDisplayValue('secret')).toHaveClass(
+      'px-4',
+      'py-3',
+      'border-gray-300'
+    );
+    expect(screen.getByRole('button', { name: 'パスワードを表示する' })).toHaveClass(
+      'size-6',
+      'md:h-6',
+      'md:w-11'
+    );
+    expect(
+      screen.getByRole('button', { name: 'パスワードを表示する' }).querySelector('img')
+    ).toHaveAttribute('width', '44');
+    expect(
+      screen.getByRole('button', { name: 'パスワードを表示する' }).querySelector('img')
+    ).toHaveAttribute('height', '24');
+  });
 });

@@ -108,6 +108,15 @@ describe('SubmitButton', () => {
     });
   });
 
+  describe('className', () => {
+    it('追加クラスを適用できる', () => {
+      render(<SubmitButton text="送信" className="w-[100px] text-[16px]" />);
+
+      const button = screen.getByRole('button');
+      expect(button).toHaveClass('w-[100px]', 'text-[16px]');
+    });
+  });
+
   describe('アクセシビリティ', () => {
     it('ボタンとして適切にアクセス可能', () => {
       render(<SubmitButton text="送信" />);

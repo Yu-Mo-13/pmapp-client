@@ -22,6 +22,7 @@ type PasswordListProps = {
   applications: PasswordApplicationOption[];
   selectedApplicationId?: string;
   errorMessage?: string;
+  showCreateButton?: boolean;
 };
 
 const PasswordList: React.FC<PasswordListProps> = ({
@@ -30,6 +31,7 @@ const PasswordList: React.FC<PasswordListProps> = ({
   applications,
   selectedApplicationId = '',
   errorMessage,
+  showCreateButton = true,
 }) => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -58,15 +60,19 @@ const PasswordList: React.FC<PasswordListProps> = ({
   };
 
   return (
-    <main className="flex-1 p-6" role="main">
-      <div className="flex justify-between items-center mb-8">
+    <main className="flex-1 p-4 md:p-6" role="main">
+      <div className="mb-6 flex flex-col gap-4 md:mb-8 md:flex-row md:items-center md:justify-between [&_h2]:mb-0">
         <Title title={title} />
-        <SubmitButton onClick={handleCreateClick} text="新規登録" />
+        {showCreateButton && (
+          <div className="hidden w-full md:block md:w-auto">
+            <SubmitButton onClick={handleCreateClick} text="新規登録" />
+          </div>
+        )}
       </div>
 
       {/* アプリケーション */}
-      <div>
-        <div className="relative w-[97%] m-4 py-3">
+      <div className="mb-6">
+        <div className="relative w-full py-0 md:m-4 md:w-[97%] md:py-3">
           <select
             name="application_id"
             value={resolvedApplicationId}

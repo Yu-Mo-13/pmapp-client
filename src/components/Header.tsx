@@ -81,20 +81,65 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
 
   return (
     <header
-      className="text-white p-4 flex justify-between items-center w-full"
+      className="text-white flex justify-between items-center w-full px-4 py-3 md:p-4"
       style={{ backgroundColor: '#3E3E3E' }}
     >
-      <h1 className="text-xl font-bold">{appName}</h1>
+      <div className="flex items-center gap-3">
+        {props.onMobileMenuToggle && (
+          <button
+            type="button"
+            onClick={props.onMobileMenuToggle}
+            className="flex h-8 w-8 items-center justify-center rounded md:hidden"
+            aria-label={
+              props.isMobileMenuOpen
+                ? 'メニューを閉じる'
+                : 'メニューを開く'
+            }
+            aria-expanded={props.isMobileMenuOpen}
+            aria-controls="mobile-navigation"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              className="h-6 w-6"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M3 18V16H21V18H3ZM3 13V11H21V13H3ZM3 8V6H21V8H3Z" fill="white" />
+            </svg>
+          </button>
+        )}
+        <h1 className="text-xl font-bold">{appName}</h1>
+      </div>
       <div className="flex items-center gap-3">
         <span className="text-xl">{userName}</span>
         {userName !== 'ゲスト' && (
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="px-3 py-1 text-sm border border-white rounded hover:bg-white hover:text-[#3E3E3E] transition-colors"
-          >
-            ログアウト
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="hidden px-3 py-1 text-sm border border-white rounded hover:bg-white hover:text-[#3E3E3E] transition-colors md:inline-flex"
+            >
+              ログアウト
+            </button>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex h-8 w-8 -mr-[5px] items-center justify-center rounded md:hidden"
+              aria-label="ログアウト"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="h-6 w-6"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M5 21C4.45 21 3.97917 20.8042 3.5875 20.4125C3.19583 20.0208 3 19.55 3 19V5C3 4.45 3.19583 3.97917 3.5875 3.5875C3.97917 3.19583 4.45 3 5 3H12V5H5V19H12V21H5ZM16 17L14.625 15.55L17.175 13H9V11H17.175L14.625 8.45L16 7L21 12L16 17Z"
+                  fill="white"
+                />
+              </svg>
+            </button>
+          </>
         )}
       </div>
     </header>

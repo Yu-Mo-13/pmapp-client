@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import PasswordList from './_components/PasswordList';
 import { PasswordApplicationOption } from './types';
 import { ApplicationService } from '@/api/services/application/applicationService';
+import { AuthService, extractUserRole } from '@/api/services/auth/authService';
 import {
   extractPasswordIndexRows,
   PasswordService,
@@ -54,18 +55,21 @@ const parseApplicationId = (
   return Number.isInteger(parsedValue) ? parsedValue : undefined;
 };
 
-const Page: React.FC<PasswordPageProps> = async ({ searchParams }) => {
+export const Page: React.FC<PasswordPageProps> = async ({ searchParams }) => {
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const selectedApplicationId = parseApplicationId(
     resolvedSearchParams.application_id
   );
   const authConfig = await getServerAuthConfig();
-  const [applicationsResponse, passwordsResponse] = await Promise.all([
+  const [applicationsResponse, passwordsResponse, loginStatusResponse] =
+    await Promise.all([
     ApplicationService.index(authConfig),
     PasswordService.index(selectedApplicationId ?? undefined, authConfig),
-  ]).then(([applications, passwords]) => [
+    AuthService.loginStatus(authConfig),
+  ]).then(([applications, passwords, loginStatus]) => [
     guardApiResponse(applications),
     guardApiResponse(passwords),
+    guardApiResponse(loginStatus),
   ]);
 
   const applications = applicationsResponse.success
@@ -74,12 +78,17 @@ const Page: React.FC<PasswordPageProps> = async ({ searchParams }) => {
   const rows = passwordsResponse.success
     ? extractPasswordIndexRows(passwordsResponse.data)
     : [];
+  const currentRole = loginStatusResponse.success
+    ? extractUserRole(loginStatusResponse.data)
+    : null;
+
   return (
     <PasswordList
       title="パスワード検索"
       rows={rows}
       applications={applications}
       selectedApplicationId={selectedApplicationId?.toString()}
+      showCreateButton={currentRole !== 'mobile'}
     />
   );
 };

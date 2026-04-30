@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { apiClient } from '@/api';
 import {
   AuthService,
+  extractTopPageUrl,
   extractUserName,
   extractUserNameFromToken,
 } from '@/api/services/auth/authService';
@@ -43,12 +44,17 @@ const LoginForm: React.FC = () => {
         localStorage.setItem('auth_user_name', userName);
       }
 
+      const redirectTo =
+        state.topPageUrl ||
+        (response.success ? extractTopPageUrl(response.data) : null) ||
+        '/login';
+
       window.dispatchEvent(new Event('auth-token-updated'));
-      router.push('/applications');
+      router.push(redirectTo);
     };
 
     void handleLoginSuccess();
-  }, [state.shouldRedirect, state.accessToken, router]);
+  }, [state.shouldRedirect, state.accessToken, state.topPageUrl, router]);
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 bg-[#f0f0f0]">

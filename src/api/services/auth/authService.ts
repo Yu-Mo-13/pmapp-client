@@ -1,5 +1,5 @@
 import apiClient from '../../client';
-import { ApiResponse } from '../../types';
+import { ApiResponse, RequestConfig } from '../../types';
 import { extractValidationErrors } from '../../utils/validationErrorTransformer';
 
 export interface LoginRequest {
@@ -11,11 +11,18 @@ export interface LoginRequest {
 export interface LoginResponse {
   access_token?: string;
   token?: string;
+  top_page_url?: string;
 }
 
 export interface LoginStatusResponse {
   name: string;
+  top_page_url?: string;
+  role?: {
+    code: string;
+  } | null;
 }
+
+export type AppUserRole = 'admin' | 'general' | 'mobile';
 
 export interface LoginValidationError {
   email?: string[];
@@ -44,14 +51,64 @@ export class AuthService {
     return response as ApiResponse<LoginResponse>;
   }
 
-  static async loginStatus(): Promise<ApiResponse<LoginStatusResponse>> {
-    return apiClient.get<LoginStatusResponse>('/login/status');
+  static async loginStatus(
+    config?: RequestConfig
+  ): Promise<ApiResponse<LoginStatusResponse>> {
+    return apiClient.get<LoginStatusResponse>('/login/status', config);
   }
 
   static async logout(): Promise<ApiResponse<void>> {
     return apiClient.post<void>('/logout');
   }
 }
+
+const ROLE_PATTERNS: Array<{
+  role: AppUserRole;
+  patterns: RegExp[];
+}> = [
+  {
+    role: 'admin',
+    patterns: [/^admin$/, /^administrator$/, /^システム管理者$/],
+  },
+  {
+    role: 'general',
+    patterns: [/^web_user$/, /^general$/, /^general[_\s-]?user$/, /^web一般ユーザー$/],
+  },
+  {
+    role: 'mobile',
+    patterns: [/^mobile_user$/, /^mobile$/, /^mobile[_\s-]?user$/, /^mobile一般ユーザー$/],
+  },
+];
+
+const normalizeRoleText = (value: string): string =>
+  value.trim().toLowerCase().replace(/\s+/g, '_');
+
+const normalizeUserRole = (value: unknown): AppUserRole | null => {
+  if (typeof value !== 'string') {
+    return null;
+  }
+
+  const normalized = normalizeRoleText(value);
+  const matchedRole = ROLE_PATTERNS.find(({ patterns }) =>
+    patterns.some((pattern) => pattern.test(normalized))
+  );
+
+  return matchedRole?.role ?? null;
+};
+
+export const extractUserRole = (value: unknown): AppUserRole | null => {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const obj = value as Record<string, unknown>;
+  const roleCode =
+    typeof obj.role === 'object' && obj.role !== null
+      ? (obj.role as Record<string, unknown>).code
+      : undefined;
+
+  return normalizeUserRole(roleCode);
+};
 
 export const extractUserName = (value: unknown): string | null => {
   if (!value || typeof value !== 'object') {
@@ -86,6 +143,24 @@ export const extractUserName = (value: unknown): string | null => {
   }
 
   return extractUserName(obj.data);
+};
+
+export const extractTopPageUrl = (value: unknown): string | null => {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const obj = value as Record<string, unknown>;
+  const candidates = [obj.top_page_url, obj.topPageUrl, obj.top_page_path];
+  const found = candidates.find(
+    (candidate): candidate is string =>
+      typeof candidate === 'string' && candidate.startsWith('/')
+  );
+  if (found) {
+    return found;
+  }
+
+  return extractTopPageUrl(obj.data);
 };
 
 const decodeBase64Url = (value: string): string | null => {
