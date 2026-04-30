@@ -96,4 +96,19 @@ describe('PasswordList', () => {
       screen.getAllByText('パスワード一覧を表示できません。')
     ).not.toHaveLength(0);
   });
+
+  it('新規登録ボタンを非表示にできる', () => {
+    render(
+      <PasswordList
+        title="パスワード検索"
+        rows={[]}
+        applications={[]}
+        showCreateButton={false}
+      />
+    );
+
+    expect(
+      screen.queryByRole('button', { name: '新規登録' })
+    ).not.toBeInTheDocument();
+  });
 });
