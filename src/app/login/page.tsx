@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useActionState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { Suspense, useActionState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '@/api';
 import {
   AuthService,
@@ -13,6 +13,7 @@ import SubmitButton from '@/components/button/SubmitButton';
 import { ErrorMessage } from '@/components/form/ErrorMessage';
 import { loginAction } from './loginActions';
 import type { LoginFormState } from './loginActions';
+import { resolveLoginRedirectTarget } from './redirect';
 
 const initialState: LoginFormState = {
   errors: {},
@@ -21,8 +22,9 @@ const initialState: LoginFormState = {
   shouldRedirect: false,
 };
 
-const LoginForm: React.FC = () => {
+const LoginFormContent: React.FC = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [state, formAction] = useActionState(loginAction, initialState);
 
   useEffect(() => {
@@ -44,7 +46,13 @@ const LoginForm: React.FC = () => {
         localStorage.setItem('auth_user_name', userName);
       }
 
+      const redirectParam = searchParams.get('redirect');
+      const redirectTarget = resolveLoginRedirectTarget(
+        redirectParam,
+        window.location.origin
+      );
       const redirectTo =
+        redirectTarget ||
         state.topPageUrl ||
         (response.success ? extractTopPageUrl(response.data) : null) ||
         '/login';
@@ -54,7 +62,13 @@ const LoginForm: React.FC = () => {
     };
 
     void handleLoginSuccess();
-  }, [state.shouldRedirect, state.accessToken, state.topPageUrl, router]);
+  }, [
+    state.shouldRedirect,
+    state.accessToken,
+    state.topPageUrl,
+    router,
+    searchParams,
+  ]);
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 bg-[#f0f0f0]">
@@ -116,5 +130,21 @@ const LoginForm: React.FC = () => {
     </div>
   );
 };
+
+const LoginPageFallback: React.FC = () => (
+  <div className="min-h-screen w-full flex items-center justify-center p-4 bg-[#f0f0f0]">
+    <div className="w-full max-w-md p-8 bg-white/70 rounded shadow-xl backdrop-blur-sm">
+      <h1 className="text-4xl font-bold text-center mb-10 text-[#3e3e3e]">
+        PMAPP
+      </h1>
+    </div>
+  </div>
+);
+
+const LoginForm: React.FC = () => (
+  <Suspense fallback={<LoginPageFallback />}>
+    <LoginFormContent />
+  </Suspense>
+);
 
 export default LoginForm;

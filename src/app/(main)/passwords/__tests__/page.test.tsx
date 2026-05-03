@@ -11,8 +11,7 @@ import { getServerAuthConfig } from '@/lib/serverAuthConfig';
 import { AuthService } from '@/api/services/auth/authService';
 
 jest.mock('../_components/PasswordList', () => {
-  const react = require('react');
-  const MockPasswordList = (props: unknown) => react.createElement('div', props);
+  const MockPasswordList = (props: unknown) => <div {...(props as object)} />;
 
   MockPasswordList.displayName = 'MockPasswordList';
 

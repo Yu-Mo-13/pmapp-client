@@ -26,7 +26,6 @@ const PreregistedPasswordDetailView: React.FC<
   const canTogglePassword = passwordForDisplay !== '-';
   const canRegister =
     typeof item.application_id === 'number' &&
-    typeof item.account_id === 'number' &&
     passwordForDisplay !== '-';
 
   const handleRegister = async () => {
@@ -36,12 +35,20 @@ const PreregistedPasswordDetailView: React.FC<
 
     setIsSubmitting(true);
 
+    const passwordPayload =
+      typeof item.account_id === 'number'
+        ? {
+            password: passwordForDisplay,
+            application_id: item.application_id!,
+            account_id: item.account_id,
+          }
+        : {
+            password: passwordForDisplay,
+            application_id: item.application_id!,
+          };
+
     const response = await PasswordService.create({
-      password: {
-        password: passwordForDisplay,
-        application_id: item.application_id!,
-        account_id: item.account_id!,
-      },
+      password: passwordPayload,
     });
 
     if ('success' in response && response.success) {
