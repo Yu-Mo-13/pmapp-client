@@ -36,7 +36,7 @@ export interface PasswordCreateRequest {
   password: {
     password: string;
     application_id: number;
-    account_id: number;
+    account_id?: number;
   };
   [key: string]: unknown;
 }
