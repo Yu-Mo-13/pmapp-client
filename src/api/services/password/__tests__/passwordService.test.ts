@@ -1,6 +1,34 @@
 import apiClient from '@/api/client';
 import { extractPasswordIndexRows, PasswordService } from '../passwordService';
 
+describe('PasswordService.create', () => {
+  it('account_id なしでもパスワード登録APIを呼び出せる', async () => {
+    jest.spyOn(apiClient, 'post').mockResolvedValue({
+      success: true,
+      data: {},
+    });
+
+    const response = await PasswordService.create({
+      password: {
+        password: 'secret',
+        application_id: 10,
+      },
+    });
+
+    expect(response.success).toBe(true);
+    expect(apiClient.post).toHaveBeenCalledWith(
+      '/passwords',
+      {
+        password: {
+          password: 'secret',
+          application_id: 10,
+        },
+      },
+      undefined
+    );
+  });
+});
+
 describe('PasswordService.latest', () => {
   it('account_id ありで最新パスワード取得APIを呼び出せる', async () => {
     jest.spyOn(apiClient, 'get').mockResolvedValue({

@@ -104,6 +104,44 @@ describe('PreregistedPasswordDetailView', () => {
     });
   });
 
+  it('account_id がないアプリでも登録できる', async () => {
+    const user = userEvent.setup();
+
+    jest.spyOn(PasswordService, 'create').mockResolvedValue({
+      success: true,
+      data: {},
+    });
+    jest.spyOn(PreregistedPasswordService, 'delete').mockResolvedValue({
+      success: true,
+      data: {},
+    });
+
+    render(
+      <PreregistedPasswordDetailView
+        item={{
+          ...item,
+          account_id: undefined,
+          account_name: 'アカウントなし',
+        }}
+      />
+    );
+
+    expect(screen.getByRole('button', { name: '登録' })).toBeEnabled();
+
+    await user.click(screen.getByRole('button', { name: '登録' }));
+
+    await waitFor(() => {
+      expect(PasswordService.create).toHaveBeenCalledWith({
+        password: {
+          password: 'secret',
+          application_id: 1,
+        },
+      });
+      expect(PreregistedPasswordService.delete).toHaveBeenCalledWith('pre-uuid');
+      expect(mockPush).toHaveBeenCalledWith('/temp-passwords');
+    });
+  });
+
   it('モバイル向けに詳細項目と操作ボタンを縦積みレイアウトで表示する', () => {
     render(<PreregistedPasswordDetailView item={item} />);
 
