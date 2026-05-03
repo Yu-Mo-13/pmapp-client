@@ -6,6 +6,7 @@ export { MenuService, extractMenuItems } from './menu/menuService';
 export { PasswordService } from './password/passwordService';
 export {
   PreregistedPasswordService,
+  extractPreregistedPasswordTarget,
   extractPreregistedPasswordIndexRows,
   extractPreregistedPasswordShow,
 } from './preregistedPassword/preregistedPasswordService';
@@ -47,8 +48,12 @@ export type {
   PasswordCreateApiResponse,
 } from './password/passwordService';
 export type {
+  PreregistedPasswordCreateApiResponse,
+  PreregistedPasswordCreateRequest,
+  PreregistedPasswordCreateValidationError,
   PreregistedPasswordIndexRow,
   PreregistedPasswordShowResponse,
+  PreregistedPasswordTargetResponse,
 } from './preregistedPassword/preregistedPasswordService';
 export type {
   UnregistedPasswordIndexRow,

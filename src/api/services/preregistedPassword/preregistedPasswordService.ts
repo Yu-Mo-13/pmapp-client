@@ -1,5 +1,6 @@
 import apiClient from '../../client';
 import { ApiResponse, RequestConfig } from '../../types';
+import { extractValidationErrors } from '../../utils/validationErrorTransformer';
 
 export interface PreregistedPasswordRelation {
   id?: number;
@@ -23,6 +24,16 @@ export interface PreregistedPasswordShowResponse {
   account_name: string;
 }
 
+export interface PreregistedPasswordTargetEntity {
+  id: number;
+  name: string;
+}
+
+export interface PreregistedPasswordTargetResponse {
+  application: PreregistedPasswordTargetEntity;
+  account: PreregistedPasswordTargetEntity | null;
+}
+
 type PreregistedPasswordRaw = {
   uuid?: string;
   created_at?: string;
@@ -33,6 +44,11 @@ type PreregistedPasswordRaw = {
   account?: PreregistedPasswordRelation;
   application_name?: string;
   account_name?: string;
+};
+
+type PreregistedPasswordTargetRaw = {
+  application?: PreregistedPasswordRelation | null;
+  account?: PreregistedPasswordRelation | null;
 };
 
 type ListEnvelope =
@@ -47,9 +63,39 @@ type ShowEnvelope =
       data?: PreregistedPasswordRaw;
     };
 
+type TargetEnvelope =
+  | PreregistedPasswordTargetRaw
+  | {
+      data?: PreregistedPasswordTargetRaw;
+    };
+
 export type PreregistedPasswordDeleteResponse = {
   message?: string;
 };
+
+export interface PreregistedPasswordCreateRequest {
+  preregisted_password: {
+    application_id: number;
+    account_id?: number | null;
+  };
+  [key: string]: unknown;
+}
+
+export interface PreregistedPasswordCreateValidationError {
+  preregisted_password?: {
+    application_id?: string[];
+    account_id?: string[];
+  };
+  [key: string]: unknown;
+}
+
+export type PreregistedPasswordCreateResponse = unknown;
+
+export type PreregistedPasswordCreateApiResponse =
+  | ApiResponse<PreregistedPasswordCreateResponse>
+  | {
+      errors?: PreregistedPasswordCreateValidationError;
+    };
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null;
@@ -131,6 +177,48 @@ export const extractPreregistedPasswordShow = (
   };
 };
 
+const normalizeTargetEntity = (
+  value: unknown
+): PreregistedPasswordTargetEntity | null => {
+  if (!isObject(value)) {
+    return null;
+  }
+
+  const id = pickNumber(value.id);
+  const name = pickString(value.name);
+
+  if (typeof id !== 'number' || !name) {
+    return null;
+  }
+
+  return { id, name };
+};
+
+export const extractPreregistedPasswordTarget = (
+  value: unknown
+): PreregistedPasswordTargetResponse | null => {
+  const raw = isObject(value) && isObject(value.data) ? value.data : value;
+
+  if (!isObject(raw)) {
+    return null;
+  }
+
+  const application = normalizeTargetEntity(raw.application);
+  if (!application) {
+    return null;
+  }
+
+  const account = raw.account === null ? null : normalizeTargetEntity(raw.account);
+  if (raw.account !== null && !account) {
+    return null;
+  }
+
+  return {
+    application,
+    account,
+  };
+};
+
 export class PreregistedPasswordService {
   static async index(
     config?: RequestConfig
@@ -143,6 +231,42 @@ export class PreregistedPasswordService {
     config?: RequestConfig
   ): Promise<ApiResponse<ShowEnvelope>> {
     return apiClient.get(`/preregisted-passwords/${encodeURIComponent(uuid)}`, config);
+  }
+
+  static async target(
+    applicationId: string | number,
+    accountId?: string | number,
+    config?: RequestConfig
+  ): Promise<ApiResponse<TargetEnvelope>> {
+    const query = new URLSearchParams({
+      application_id: `${applicationId}`,
+    });
+
+    if (
+      accountId !== undefined &&
+      accountId !== null &&
+      `${accountId}`.length > 0
+    ) {
+      query.set('account_id', `${accountId}`);
+    }
+
+    return apiClient.get(`/preregisted-passwords/target?${query.toString()}`, config);
+  }
+
+  static async create(
+    request: PreregistedPasswordCreateRequest,
+    config?: RequestConfig
+  ): Promise<PreregistedPasswordCreateApiResponse> {
+    const response = await apiClient.post('/preregisted-passwords', request, config);
+
+    if (!response.success && response.validationErrors) {
+      const errors = extractValidationErrors(response);
+      if (errors) {
+        return { errors: errors as PreregistedPasswordCreateValidationError };
+      }
+    }
+
+    return response;
   }
 
   static async delete(
