@@ -46,12 +46,14 @@ const PreregistedPasswordCreateView: React.FC<
       return;
     }
 
-    setErrorMessage(
-      response.errors?.preregisted_password?.application_id?.[0] ??
-        response.errors?.preregisted_password?.account_id?.[0] ??
-        ('error' in response ? response.error?.message : null) ??
-        '仮登録に失敗しました。'
-    );
+    const message =
+      'errors' in response
+        ? response.errors?.preregisted_password?.application_id?.[0] ??
+          response.errors?.preregisted_password?.account_id?.[0] ??
+          '仮登録に失敗しました。'
+        : response.error?.message ?? '仮登録に失敗しました。';
+
+    setErrorMessage(message);
     setIsSubmitting(false);
   };
 
