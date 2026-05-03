@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useActionState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '@/api';
 import {
   AuthService,
@@ -13,6 +13,7 @@ import SubmitButton from '@/components/button/SubmitButton';
 import { ErrorMessage } from '@/components/form/ErrorMessage';
 import { loginAction } from './loginActions';
 import type { LoginFormState } from './loginActions';
+import { resolveLoginRedirectTarget } from './redirect';
 
 const initialState: LoginFormState = {
   errors: {},
@@ -23,6 +24,7 @@ const initialState: LoginFormState = {
 
 const LoginForm: React.FC = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [state, formAction] = useActionState(loginAction, initialState);
 
   useEffect(() => {
@@ -44,7 +46,13 @@ const LoginForm: React.FC = () => {
         localStorage.setItem('auth_user_name', userName);
       }
 
+      const redirectParam = searchParams.get('redirect');
+      const redirectTarget = resolveLoginRedirectTarget(
+        redirectParam,
+        window.location.origin
+      );
       const redirectTo =
+        redirectTarget ||
         state.topPageUrl ||
         (response.success ? extractTopPageUrl(response.data) : null) ||
         '/login';
@@ -54,7 +62,13 @@ const LoginForm: React.FC = () => {
     };
 
     void handleLoginSuccess();
-  }, [state.shouldRedirect, state.accessToken, state.topPageUrl, router]);
+  }, [
+    state.shouldRedirect,
+    state.accessToken,
+    state.topPageUrl,
+    router,
+    searchParams,
+  ]);
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 bg-[#f0f0f0]">
