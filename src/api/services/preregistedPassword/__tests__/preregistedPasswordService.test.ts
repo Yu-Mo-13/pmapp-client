@@ -1,6 +1,7 @@
 import {
   extractPreregistedPasswordIndexRows,
   extractPreregistedPasswordShow,
+  extractPreregistedPasswordTarget,
 } from '../preregistedPasswordService';
 
 describe('extractPreregistedPasswordIndexRows', () => {
@@ -80,5 +81,67 @@ describe('extractPreregistedPasswordShow', () => {
   it('不正な形式の場合はnullを返す', () => {
     expect(extractPreregistedPasswordShow(null)).toBeNull();
     expect(extractPreregistedPasswordShow({ data: {} })).toBeNull();
+  });
+});
+
+describe('extractPreregistedPasswordTarget', () => {
+  it('対象情報レスポンスを抽出できる', () => {
+    const result = extractPreregistedPasswordTarget({
+      data: {
+        application: {
+          id: 10,
+          name: 'Slack',
+        },
+        account: {
+          id: 20,
+          name: '@tester',
+        },
+      },
+    });
+
+    expect(result).toEqual({
+      application: {
+        id: 10,
+        name: 'Slack',
+      },
+      account: {
+        id: 20,
+        name: '@tester',
+      },
+    });
+  });
+
+  it('アカウントなしの対象情報レスポンスを抽出できる', () => {
+    const result = extractPreregistedPasswordTarget({
+      application: {
+        id: 11,
+        name: 'アカウントなしアプリ',
+      },
+      account: null,
+    });
+
+    expect(result).toEqual({
+      application: {
+        id: 11,
+        name: 'アカウントなしアプリ',
+      },
+      account: null,
+    });
+  });
+
+  it('不正な形式の場合はnullを返す', () => {
+    expect(extractPreregistedPasswordTarget(null)).toBeNull();
+    expect(extractPreregistedPasswordTarget({ data: {} })).toBeNull();
+    expect(
+      extractPreregistedPasswordTarget({
+        data: {
+          application: {
+            id: 'invalid',
+            name: 'Slack',
+          },
+          account: null,
+        },
+      })
+    ).toBeNull();
   });
 });
