@@ -67,6 +67,10 @@ export async function loginAction(
     const errorMessage =
       'message' in response && typeof response.message === 'string'
         ? response.message
+        : 'error' in response &&
+            response.error &&
+            typeof response.error.message === 'string'
+          ? response.error.message
         : 'ログインに失敗しました。もう一度お試しください。';
 
     return {
