@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Td, TableRowWrapper } from '@/components/table';
 import MobileInfoCard from '@/components/MobileInfoCard';
 import { PasswordService } from '@/api/services/password/passwordService';
@@ -21,6 +22,79 @@ const PASSWORD_COPY_ERROR_MESSAGE = 'パスワードのコピーに失敗しま�
 const actionButtonClassName =
   'text-white rounded text-sm font-medium bg-[#3CB371] hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-opacity duration-200 disabled:cursor-not-allowed disabled:opacity-60';
 
+const copyWithClipboardEvent = (text: string) => {
+  if (
+    typeof document === 'undefined' ||
+    typeof document.execCommand !== 'function'
+  ) {
+    return false;
+  }
+
+  let copied = false;
+  const handleCopy = (event: ClipboardEvent) => {
+    event.preventDefault();
+    event.clipboardData?.setData('text/plain', text);
+    copied = true;
+  };
+
+  document.addEventListener('copy', handleCopy);
+
+  try {
+    return document.execCommand('copy') && copied;
+  } finally {
+    document.removeEventListener('copy', handleCopy);
+  }
+};
+
+const fallbackCopyText = (text: string) => {
+  if (
+    typeof document === 'undefined' ||
+    !document.body ||
+    typeof document.execCommand !== 'function'
+  ) {
+    return false;
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.top = '0';
+  textarea.style.left = '-9999px';
+  textarea.style.fontSize = '16px';
+  textarea.style.pointerEvents = 'none';
+
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  textarea.setSelectionRange(0, text.length);
+
+  const copied = document.execCommand('copy');
+  document.body.removeChild(textarea);
+
+  return copied;
+};
+
+const copyPasswordToClipboard = async (text: string) => {
+  if (typeof navigator !== 'undefined') {
+    try {
+      if (typeof navigator.clipboard?.writeText === 'function') {
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+    } catch {
+      // iPhone Safari can reject the Clipboard API even from a user gesture.
+    }
+  }
+
+  if (copyWithClipboardEvent(text)) {
+    return;
+  }
+
+  if (!fallbackCopyText(text)) {
+    throw new Error('Clipboard copy failed');
+  }
+};
+
 const PasswordTr: React.FC<PasswordTrProps> = ({
   row,
   onActionMessage,
@@ -28,6 +102,23 @@ const PasswordTr: React.FC<PasswordTrProps> = ({
 }) => {
   const borderStyle = { borderColor: '#d1d5db' };
   const [isLoading, setIsLoading] = useState(false);
+  const [manualCopyPassword, setManualCopyPassword] = useState<string | null>(
+    null
+  );
+  const manualCopyRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!manualCopyPassword) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      manualCopyRef.current?.focus();
+      manualCopyRef.current?.select();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [manualCopyPassword]);
 
   const handleGetLatestPassword = async () => {
     if (isLoading) {
@@ -68,19 +159,13 @@ const PasswordTr: React.FC<PasswordTrProps> = ({
     }
 
     try {
-      if (
-        typeof navigator === 'undefined' ||
-        typeof navigator.clipboard?.writeText !== 'function'
-      ) {
-        throw new Error('Clipboard API is unavailable');
-      }
-
-      await navigator.clipboard.writeText(latestPassword);
+      await copyPasswordToClipboard(latestPassword);
       onActionMessage({
         type: 'success',
         text: PASSWORD_COPY_SUCCESS_MESSAGE,
       });
     } catch {
+      setManualCopyPassword(latestPassword);
       onActionMessage({
         type: 'error',
         text: PASSWORD_COPY_ERROR_MESSAGE,
@@ -88,55 +173,105 @@ const PasswordTr: React.FC<PasswordTrProps> = ({
     }
   };
 
+  const manualCopyDialog =
+    manualCopyPassword && typeof document !== 'undefined'
+      ? createPortal(
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="manual-copy-title"
+          >
+            <div className="w-full max-w-md rounded-md bg-white p-6 shadow-xl">
+              <h2
+                id="manual-copy-title"
+                className="mb-3 text-lg font-bold text-black"
+              >
+                パスワードを手動でコピーしてください
+              </h2>
+              <p className="mb-4 text-sm text-gray-700">
+                ブラウザの制限により自動コピーできませんでした。以下の値を選択して手動でコピーしてください。
+              </p>
+              <input
+                ref={manualCopyRef}
+                type="text"
+                readOnly
+                value={manualCopyPassword}
+                aria-label="手動コピー用パスワード"
+                onFocus={(event) => event.currentTarget.select()}
+                className="w-full rounded border border-gray-300 px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+              <div className="mt-4 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setManualCopyPassword(null)}
+                  className="rounded bg-[#3E3E3E] px-4 py-2 text-sm font-medium text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                >
+                  閉じる
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )
+      : null;
+
   if (variant === 'card') {
     return (
-      <MobileInfoCard
-        onClick={handleGetLatestPassword}
-        disabled={isLoading}
-        headerText={`更新日: ${formatDateTimeToMinute(row.latest_updated_at)}`}
-        primaryText={`アプリケーション名: ${row.application_name}`}
-        secondaryText={`アカウント名: ${row.account_name}`}
-        statusText={isLoading ? '取得中...' : undefined}
-      />
+      <>
+        <MobileInfoCard
+          onClick={handleGetLatestPassword}
+          disabled={isLoading}
+          headerText={`更新日: ${formatDateTimeToMinute(row.latest_updated_at)}`}
+          primaryText={`アプリケーション名: ${row.application_name}`}
+          secondaryText={`アカウント名: ${row.account_name}`}
+          statusText={isLoading ? '取得中...' : undefined}
+        />
+        {manualCopyDialog}
+      </>
     );
   }
 
   return (
-    <TableRowWrapper>
-      <Td
-        className="border-r text-left w-[130px] whitespace-nowrap"
-        style={borderStyle}
-      >
-        {formatDateTimeToMinute(row.latest_updated_at)}
-      </Td>
-
-      <Td
-        className="border-r text-left truncate"
-        style={borderStyle}
-        title={row.application_name}
-      >
-        {row.application_name}
-      </Td>
-
-      <Td
-        className="border-r text-left truncate"
-        style={borderStyle}
-        title={row.account_name}
-      >
-        {row.account_name}
-      </Td>
-
-      <Td className="text-center">
-        <button
-          type="button"
-          onClick={handleGetLatestPassword}
-          disabled={isLoading}
-          className={`${actionButtonClassName} px-6 py-3`}
+    <>
+      <TableRowWrapper>
+        <Td
+          className="border-r text-left w-[130px] whitespace-nowrap"
+          style={borderStyle}
         >
-          {isLoading ? '取得中...' : '取得'}
-        </button>
-      </Td>
-    </TableRowWrapper>
+          {formatDateTimeToMinute(row.latest_updated_at)}
+        </Td>
+
+        <Td
+          className="border-r text-left truncate"
+          style={borderStyle}
+          title={row.application_name}
+        >
+          {row.application_name}
+        </Td>
+
+        <Td
+          className="border-r text-left truncate"
+          style={borderStyle}
+          title={row.account_name}
+        >
+          {row.account_name}
+        </Td>
+
+        <Td className="text-center">
+          <button
+            type="button"
+            onClick={handleGetLatestPassword}
+            disabled={isLoading}
+            className={`${actionButtonClassName} px-6 py-3`}
+          >
+            {isLoading ? '取得中...' : '取得'}
+          </button>
+        </Td>
+      </TableRowWrapper>
+
+      {manualCopyDialog}
+    </>
   );
 };
 
