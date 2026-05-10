@@ -228,6 +228,21 @@ describe('PasswordTr', () => {
         text: 'パスワードのコピーに失敗しました。',
       });
     });
+
+    expect(
+      screen.getByRole('dialog', {
+        name: 'パスワードを手動でコピーしてください',
+      })
+    ).toBeInTheDocument();
+    expect(screen.getByDisplayValue('secret-password')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '閉じる' }));
+
+    expect(
+      screen.queryByRole('dialog', {
+        name: 'パスワードを手動でコピーしてください',
+      })
+    ).not.toBeInTheDocument();
   });
 
   it('カード表示でも取得操作ができる', async () => {
