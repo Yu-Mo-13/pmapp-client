@@ -121,6 +121,13 @@ const LoginFormContent: React.FC = () => {
             )}
           </div>
 
+          {state.errors?.form && (
+            <ErrorMessage
+              message={state.errors?.form?.[0]}
+              className="mb-4 mt-0 text-left"
+            />
+          )}
+
           {/* ログインボタン */}
           <div className="text-center">
             <SubmitButton isSubmit text="ログイン" />

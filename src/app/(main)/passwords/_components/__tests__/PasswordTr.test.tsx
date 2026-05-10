@@ -17,7 +17,39 @@ describe('PasswordTr', () => {
 
   beforeEach(() => {
     onActionMessage.mockReset();
+    jest.restoreAllMocks();
   });
+
+  const mockExecCommand = ({
+    result,
+    dispatchCopyEvent = false,
+  }: {
+    result: boolean;
+    dispatchCopyEvent?: boolean;
+  }) => {
+    Object.defineProperty(document, 'execCommand', {
+      configurable: true,
+      value: jest.fn().mockImplementation(() => {
+        if (dispatchCopyEvent) {
+          const event = new Event('copy', {
+            bubbles: true,
+            cancelable: true,
+          }) as ClipboardEvent;
+
+          Object.defineProperty(event, 'clipboardData', {
+            configurable: true,
+            value: {
+              setData: jest.fn(),
+            },
+          });
+
+          document.dispatchEvent(event);
+        }
+
+        return result;
+      }),
+    });
+  };
 
   it('取得成功時にコピー完了メッセージを表示する', async () => {
     const user = userEvent.setup();
@@ -103,13 +135,78 @@ describe('PasswordTr', () => {
     });
   });
 
-  it('クリップボードAPIが使えない場合はエラーメッセージを表示する', async () => {
+  it('クリップボードAPIが使えない場合はフォールバックでコピーする', async () => {
     const user = userEvent.setup();
 
     Object.defineProperty(navigator, 'clipboard', {
       configurable: true,
       value: undefined,
     });
+    mockExecCommand({ result: true, dispatchCopyEvent: true });
+    jest.spyOn(PasswordService, 'latest').mockResolvedValue({
+      success: true,
+      data: { password: 'secret-password' },
+    });
+
+    render(
+      <table>
+        <tbody>
+          <PasswordTr row={row} onActionMessage={onActionMessage} />
+        </tbody>
+      </table>
+    );
+
+    await user.click(screen.getByRole('button', { name: '取得' }));
+
+    await waitFor(() => {
+      expect(onActionMessage).toHaveBeenLastCalledWith({
+        type: 'success',
+        text: 'パスワードをコピーしました。',
+      });
+    });
+  });
+
+  it('Clipboard API が失敗した場合はフォールバックでコピーする', async () => {
+    const user = userEvent.setup();
+
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: jest.fn().mockRejectedValue(new Error('copy failed')),
+      },
+    });
+    mockExecCommand({ result: true, dispatchCopyEvent: true });
+    jest.spyOn(PasswordService, 'latest').mockResolvedValue({
+      success: true,
+      data: { password: 'secret-password' },
+    });
+
+    render(
+      <table>
+        <tbody>
+          <PasswordTr row={row} onActionMessage={onActionMessage} />
+        </tbody>
+      </table>
+    );
+
+    await user.click(screen.getByRole('button', { name: '取得' }));
+
+    await waitFor(() => {
+      expect(onActionMessage).toHaveBeenLastCalledWith({
+        type: 'success',
+        text: 'パスワードをコピーしました。',
+      });
+    });
+  });
+
+  it('フォールバックでもコピーできない場合はエラーメッセージを表示する', async () => {
+    const user = userEvent.setup();
+
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: undefined,
+    });
+    mockExecCommand({ result: false });
     jest.spyOn(PasswordService, 'latest').mockResolvedValue({
       success: true,
       data: { password: 'secret-password' },
@@ -131,6 +228,21 @@ describe('PasswordTr', () => {
         text: 'パスワードのコピーに失敗しました。',
       });
     });
+
+    expect(
+      screen.getByRole('dialog', {
+        name: 'パスワードを手動でコピーしてください',
+      })
+    ).toBeInTheDocument();
+    expect(screen.getByDisplayValue('secret-password')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '閉じる' }));
+
+    expect(
+      screen.queryByRole('dialog', {
+        name: 'パスワードを手動でコピーしてください',
+      })
+    ).not.toBeInTheDocument();
   });
 
   it('カード表示でも取得操作ができる', async () => {

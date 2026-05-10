@@ -27,6 +27,7 @@ export type AppUserRole = 'admin' | 'general' | 'mobile';
 export interface LoginValidationError {
   email?: string[];
   password?: string[];
+  form?: string[];
   [key: string]: unknown;
 }
 
@@ -43,7 +44,7 @@ export class AuthService {
     // バリデーションエラーがある場合は変換して返す
     if (!response.success && response.validationErrors) {
       const errors = extractValidationErrors(response);
-      if (errors) {
+      if (errors && Object.keys(errors).length > 0) {
         return { errors: errors as LoginValidationError };
       }
     }
