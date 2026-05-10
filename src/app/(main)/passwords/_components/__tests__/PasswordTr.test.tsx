@@ -20,10 +20,34 @@ describe('PasswordTr', () => {
     jest.restoreAllMocks();
   });
 
-  const mockExecCommand = (result: boolean) => {
+  const mockExecCommand = ({
+    result,
+    dispatchCopyEvent = false,
+  }: {
+    result: boolean;
+    dispatchCopyEvent?: boolean;
+  }) => {
     Object.defineProperty(document, 'execCommand', {
       configurable: true,
-      value: jest.fn().mockReturnValue(result),
+      value: jest.fn().mockImplementation(() => {
+        if (dispatchCopyEvent) {
+          const event = new Event('copy', {
+            bubbles: true,
+            cancelable: true,
+          }) as ClipboardEvent;
+
+          Object.defineProperty(event, 'clipboardData', {
+            configurable: true,
+            value: {
+              setData: jest.fn(),
+            },
+          });
+
+          document.dispatchEvent(event);
+        }
+
+        return result;
+      }),
     });
   };
 
@@ -118,7 +142,7 @@ describe('PasswordTr', () => {
       configurable: true,
       value: undefined,
     });
-    mockExecCommand(true);
+    mockExecCommand({ result: true, dispatchCopyEvent: true });
     jest.spyOn(PasswordService, 'latest').mockResolvedValue({
       success: true,
       data: { password: 'secret-password' },
@@ -151,7 +175,7 @@ describe('PasswordTr', () => {
         writeText: jest.fn().mockRejectedValue(new Error('copy failed')),
       },
     });
-    mockExecCommand(true);
+    mockExecCommand({ result: true, dispatchCopyEvent: true });
     jest.spyOn(PasswordService, 'latest').mockResolvedValue({
       success: true,
       data: { password: 'secret-password' },
@@ -182,7 +206,7 @@ describe('PasswordTr', () => {
       configurable: true,
       value: undefined,
     });
-    mockExecCommand(false);
+    mockExecCommand({ result: false });
     jest.spyOn(PasswordService, 'latest').mockResolvedValue({
       success: true,
       data: { password: 'secret-password' },

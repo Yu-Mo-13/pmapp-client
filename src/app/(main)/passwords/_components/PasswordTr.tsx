@@ -21,6 +21,30 @@ const PASSWORD_COPY_ERROR_MESSAGE = 'パスワードのコピーに失敗しま�
 const actionButtonClassName =
   'text-white rounded text-sm font-medium bg-[#3CB371] hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-opacity duration-200 disabled:cursor-not-allowed disabled:opacity-60';
 
+const copyWithClipboardEvent = (text: string) => {
+  if (
+    typeof document === 'undefined' ||
+    typeof document.execCommand !== 'function'
+  ) {
+    return false;
+  }
+
+  let copied = false;
+  const handleCopy = (event: ClipboardEvent) => {
+    event.preventDefault();
+    event.clipboardData?.setData('text/plain', text);
+    copied = true;
+  };
+
+  document.addEventListener('copy', handleCopy);
+
+  try {
+    return document.execCommand('copy') && copied;
+  } finally {
+    document.removeEventListener('copy', handleCopy);
+  }
+};
+
 const fallbackCopyText = (text: string) => {
   if (
     typeof document === 'undefined' ||
@@ -32,12 +56,11 @@ const fallbackCopyText = (text: string) => {
 
   const textarea = document.createElement('textarea');
   textarea.value = text;
-  textarea.setAttribute('readonly', '');
   textarea.style.position = 'fixed';
   textarea.style.top = '0';
-  textarea.style.left = '0';
-  textarea.style.opacity = '0';
+  textarea.style.left = '-9999px';
   textarea.style.fontSize = '16px';
+  textarea.style.pointerEvents = 'none';
 
   document.body.appendChild(textarea);
   textarea.focus();
@@ -60,6 +83,10 @@ const copyPasswordToClipboard = async (text: string) => {
     } catch {
       // iPhone Safari can reject the Clipboard API even from a user gesture.
     }
+  }
+
+  if (copyWithClipboardEvent(text)) {
+    return;
   }
 
   if (!fallbackCopyText(text)) {
