@@ -17,7 +17,15 @@ describe('PasswordTr', () => {
 
   beforeEach(() => {
     onActionMessage.mockReset();
+    jest.restoreAllMocks();
   });
+
+  const mockExecCommand = (result: boolean) => {
+    Object.defineProperty(document, 'execCommand', {
+      configurable: true,
+      value: jest.fn().mockReturnValue(result),
+    });
+  };
 
   it('取得成功時にコピー完了メッセージを表示する', async () => {
     const user = userEvent.setup();
@@ -103,13 +111,78 @@ describe('PasswordTr', () => {
     });
   });
 
-  it('クリップボードAPIが使えない場合はエラーメッセージを表示する', async () => {
+  it('クリップボードAPIが使えない場合はフォールバックでコピーする', async () => {
     const user = userEvent.setup();
 
     Object.defineProperty(navigator, 'clipboard', {
       configurable: true,
       value: undefined,
     });
+    mockExecCommand(true);
+    jest.spyOn(PasswordService, 'latest').mockResolvedValue({
+      success: true,
+      data: { password: 'secret-password' },
+    });
+
+    render(
+      <table>
+        <tbody>
+          <PasswordTr row={row} onActionMessage={onActionMessage} />
+        </tbody>
+      </table>
+    );
+
+    await user.click(screen.getByRole('button', { name: '取得' }));
+
+    await waitFor(() => {
+      expect(onActionMessage).toHaveBeenLastCalledWith({
+        type: 'success',
+        text: 'パスワードをコピーしました。',
+      });
+    });
+  });
+
+  it('Clipboard API が失敗した場合はフォールバックでコピーする', async () => {
+    const user = userEvent.setup();
+
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: jest.fn().mockRejectedValue(new Error('copy failed')),
+      },
+    });
+    mockExecCommand(true);
+    jest.spyOn(PasswordService, 'latest').mockResolvedValue({
+      success: true,
+      data: { password: 'secret-password' },
+    });
+
+    render(
+      <table>
+        <tbody>
+          <PasswordTr row={row} onActionMessage={onActionMessage} />
+        </tbody>
+      </table>
+    );
+
+    await user.click(screen.getByRole('button', { name: '取得' }));
+
+    await waitFor(() => {
+      expect(onActionMessage).toHaveBeenLastCalledWith({
+        type: 'success',
+        text: 'パスワードをコピーしました。',
+      });
+    });
+  });
+
+  it('フォールバックでもコピーできない場合はエラーメッセージを表示する', async () => {
+    const user = userEvent.setup();
+
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: undefined,
+    });
+    mockExecCommand(false);
     jest.spyOn(PasswordService, 'latest').mockResolvedValue({
       success: true,
       data: { password: 'secret-password' },

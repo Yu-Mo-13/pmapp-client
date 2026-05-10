@@ -21,6 +21,52 @@ const PASSWORD_COPY_ERROR_MESSAGE = 'パスワードのコピーに失敗しま�
 const actionButtonClassName =
   'text-white rounded text-sm font-medium bg-[#3CB371] hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-opacity duration-200 disabled:cursor-not-allowed disabled:opacity-60';
 
+const fallbackCopyText = (text: string) => {
+  if (
+    typeof document === 'undefined' ||
+    !document.body ||
+    typeof document.execCommand !== 'function'
+  ) {
+    return false;
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.top = '0';
+  textarea.style.left = '0';
+  textarea.style.opacity = '0';
+  textarea.style.fontSize = '16px';
+
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  textarea.setSelectionRange(0, text.length);
+
+  const copied = document.execCommand('copy');
+  document.body.removeChild(textarea);
+
+  return copied;
+};
+
+const copyPasswordToClipboard = async (text: string) => {
+  if (typeof navigator !== 'undefined') {
+    try {
+      if (typeof navigator.clipboard?.writeText === 'function') {
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+    } catch {
+      // iPhone Safari can reject the Clipboard API even from a user gesture.
+    }
+  }
+
+  if (!fallbackCopyText(text)) {
+    throw new Error('Clipboard copy failed');
+  }
+};
+
 const PasswordTr: React.FC<PasswordTrProps> = ({
   row,
   onActionMessage,
@@ -68,14 +114,7 @@ const PasswordTr: React.FC<PasswordTrProps> = ({
     }
 
     try {
-      if (
-        typeof navigator === 'undefined' ||
-        typeof navigator.clipboard?.writeText !== 'function'
-      ) {
-        throw new Error('Clipboard API is unavailable');
-      }
-
-      await navigator.clipboard.writeText(latestPassword);
+      await copyPasswordToClipboard(latestPassword);
       onActionMessage({
         type: 'success',
         text: PASSWORD_COPY_SUCCESS_MESSAGE,
