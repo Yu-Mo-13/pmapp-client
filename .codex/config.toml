@@ -7,3 +7,8 @@ rmcp_client = true
 
 [mcp_servers.figma]
 url = "https://mcp.figma.com/mcp"
+
+[mcp_servers.pmapp]
+command = "node"
+args = ["/Users/motozono/ai/pmapp-mcp-server/src/index.ts"]
+env = { PMAPP_API_BASE_URL = "http://localhost:8080" }
