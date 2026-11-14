@@ -81,7 +81,7 @@ describe('passwords page', () => {
   beforeEach(() => {
     mockApplicationIndex.mockResolvedValue({
       success: true,
-      data: [],
+      data: { data: [] },
     });
     mockPasswordIndex.mockResolvedValue({
       success: true,
@@ -113,10 +113,8 @@ describe('passwords page', () => {
     });
 
     expect(React.isValidElement(result)).toBe(true);
-    expect(result.props).toEqual(
-      expect.objectContaining({
-        showCreateButton: false,
-      })
-    );
+    expect(result).toMatchObject({
+      props: { showCreateButton: false },
+    });
   });
 });

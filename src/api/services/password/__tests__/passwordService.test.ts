@@ -15,7 +15,7 @@ describe('PasswordService.create', () => {
       },
     });
 
-    expect(response.success).toBe(true);
+    expect(response).toMatchObject({ success: true });
     expect(apiClient.post).toHaveBeenCalledWith(
       '/passwords',
       {
@@ -41,7 +41,7 @@ describe('PasswordService.latest', () => {
       account_id: 20,
     });
 
-    expect(response.success).toBe(true);
+    expect(response).toMatchObject({ success: true });
     expect(response.data).toEqual({ password: 'secret' });
     expect(apiClient.get).toHaveBeenCalledWith(
       '/passwords/latest?application_id=10&account_id=20',
@@ -59,7 +59,7 @@ describe('PasswordService.latest', () => {
       application_id: 10,
     });
 
-    expect(response.success).toBe(true);
+    expect(response).toMatchObject({ success: true });
     expect(response.data).toEqual({ password: 'secret' });
     expect(apiClient.get).toHaveBeenCalledWith(
       '/passwords/latest?application_id=10',

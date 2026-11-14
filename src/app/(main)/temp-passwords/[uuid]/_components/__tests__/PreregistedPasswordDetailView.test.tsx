@@ -45,13 +45,14 @@ describe('PreregistedPasswordDetailView', () => {
     jest.restoreAllMocks();
     mockPush.mockReset();
     mockUseRouter.mockReturnValue({
+      bfcacheId: 'test-route',
       push: mockPush,
       back: jest.fn(),
       forward: jest.fn(),
       refresh: jest.fn(),
       replace: jest.fn(),
       prefetch: jest.fn(),
-    } as ReturnType<typeof useRouter>);
+    });
   });
 
   it('本登録成功後に仮登録パスワードを削除して一覧へ遷移する', async () => {

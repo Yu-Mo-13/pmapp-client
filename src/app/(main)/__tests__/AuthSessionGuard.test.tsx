@@ -38,13 +38,14 @@ describe('AuthSessionGuard', () => {
 
     mockUsePathname.mockReturnValue('/passwords');
     mockUseRouter.mockReturnValue({
+      bfcacheId: 'test-route',
       replace: mockReplace,
       push: jest.fn(),
       back: jest.fn(),
       forward: jest.fn(),
       refresh: jest.fn(),
       prefetch: jest.fn(),
-    } as ReturnType<typeof useRouter>);
+    });
 
     mockLoginStatus.mockResolvedValue({
       success: true,

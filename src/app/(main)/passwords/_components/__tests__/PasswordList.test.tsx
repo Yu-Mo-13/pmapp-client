@@ -45,13 +45,14 @@ describe('PasswordList', () => {
     mockSetApplicationId.mockReset();
 
     mockUseRouter.mockReturnValue({
+      bfcacheId: 'test-route',
       push: mockPush,
       back: jest.fn(),
       forward: jest.fn(),
       refresh: jest.fn(),
       replace: jest.fn(),
       prefetch: jest.fn(),
-    } as ReturnType<typeof useRouter>);
+    });
     mockUseQueryState.mockReturnValue([
       2,
       mockSetApplicationId,
