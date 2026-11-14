@@ -28,13 +28,14 @@ describe('PreregistedPasswordCreateView', () => {
     jest.restoreAllMocks();
     mockPush.mockReset();
     mockUseRouter.mockReturnValue({
+      bfcacheId: 'test-route',
       push: mockPush,
       back: jest.fn(),
       forward: jest.fn(),
       refresh: jest.fn(),
       replace: jest.fn(),
       prefetch: jest.fn(),
-    } as ReturnType<typeof useRouter>);
+    });
   });
 
   it('仮登録成功後に一覧へ遷移する', async () => {
